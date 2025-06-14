@@ -168,9 +168,9 @@ button2 = tk.Button(frame1, image=zero2_img, command=lambda: open_file('Zero 2')
 button2.grid(row=0, column=1, padx=10, pady=10)
 
 button3 = tk.Button(frame1, image=zero3_img, command=lambda: open_file('Zero 3'))
-button3.grid(row=0, column=2, padx=10, pady=10)
+button3.grid(row=1, column=0, padx=10, pady=10)
 
 button4 = tk.Button(frame1, image=zero4_img, command=lambda: open_file('Zero 4'))
-button4.grid(row=0, column=3, padx=10, pady=10)
+button4.grid(row=1, column=1, padx=10, pady=10)
 
 root.mainloop()
