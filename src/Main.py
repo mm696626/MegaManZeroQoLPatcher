@@ -85,30 +85,33 @@ def open_file(game_name):
 
 def show_patch_options(game_name, file_path, save_path):
     def apply_patches():
+        patch_list = []
+
         if game_name == 'Zero 1':
             if blood_restore.get():
-                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz1_blood.ips")
+                patch_list.append("patches/mmz1_blood.ips")
 
         elif game_name == 'Zero 2':
             if blood_restore.get():
-                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz2_blood.ips")
+                patch_list.append("patches/mmz2_blood.ips")
             if ex_skill.get():
-                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz2_easyexskill.ips")
+                patch_list.append("patches/mmz2_easyexskill.ips")
 
         elif game_name == 'Zero 3':
             if blood_restore.get():
-                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz3_blood.ips")
+                patch_list.append("patches/mmz3_blood.ips")
             if ex_skill.get():
-                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz3_easyexskill.ips")
+                patch_list.append("patches/mmz3_easyexskill.ips")
             if bn_viruses.get():
-                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz3_exevirus.ips")
+                patch_list.append("patches/mmz3_exevirus.ips")
 
         elif game_name == 'Zero 4':
             if blood_restore.get():
-                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz4_blood.ips")
+                patch_list.append("patches/mmz4_blood.ips")
             if vocal_restore.get():
-                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz4_vocals.ips")
+                patch_list.append("patches/mmz4_vocals.ips")
 
+        romByteModifier.apply_ips_patches(file_path, save_path, patch_list)
         patch_window.destroy()
         messagebox.showinfo("Done", f"Patching for {game_name} is complete!")
 
