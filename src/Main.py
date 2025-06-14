@@ -7,19 +7,20 @@ import hashlib
 import os
 import shutil
 
+import romByteModifier
 
 EXPECTED_MD5 = {
-    'Zero1': ['b24a17d080a01a404cbf018ba42b9803'],
-    'Zero2': ['182363b0698322e1864ced6e9eed7ead'],
-    'Zero3': ['aa1d5eeffcd5e4577db9ee6d9b1100f9'],
-    'Zero4': ['0d1e88bdb09ff68adf9877a121325f9c']
+    'Zero 1': ['b24a17d080a01a404cbf018ba42b9803'],
+    'Zero 2': ['182363b0698322e1864ced6e9eed7ead'],
+    'Zero 3': ['aa1d5eeffcd5e4577db9ee6d9b1100f9'],
+    'Zero 4': ['0d1e88bdb09ff68adf9877a121325f9c']
 }
 
 EXPECTED_SIZE = {
-    'Zero1': 8388608,
-    'Zero2': 8388608,
-    'Zero3': 8388608,
-    'Zero4': 16777216
+    'Zero 1': 8388608,
+    'Zero 2': 8388608,
+    'Zero 3': 8388608,
+    'Zero 4': 16777216
 }
 
 
@@ -77,25 +78,36 @@ def open_file(game_name):
             return
 
         copy_file(file_path, save_path)
-        show_patch_options(game_name, save_path)
+        show_patch_options(game_name, file_path, save_path)
     else:
         pass
 
 
-def show_patch_options(game_name, save_path):
+def show_patch_options(game_name, file_path, save_path):
     def apply_patches():
-        if game_name == 'Zero1':
-            pass
+        if game_name == 'Zero 1':
+            if blood_restore.get():
+                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz1_blood.ips")
 
-        elif game_name == 'Zero2':
-            pass
+        elif game_name == 'Zero 2':
+            if blood_restore.get():
+                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz2_blood.ips")
+            if ex_skill.get():
+                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz2_easyexskill.ips")
 
-        elif game_name == 'Zero3':
-            pass
+        elif game_name == 'Zero 3':
+            if blood_restore.get():
+                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz3_blood.ips")
+            if ex_skill.get():
+                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz3_easyexskill.ips")
+            if bn_viruses.get():
+                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz3_exevirus.ips")
 
-
-        elif game_name == 'Zero4':
-            pass
+        elif game_name == 'Zero 4':
+            if blood_restore.get():
+                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz4_blood.ips")
+            if vocal_restore.get():
+                romByteModifier.apply_ips_patch(file_path, save_path, "patches/mmz4_vocals.ips")
 
         patch_window.destroy()
         messagebox.showinfo("Done", f"Patching for {game_name} is complete!")
@@ -110,12 +122,15 @@ def show_patch_options(game_name, save_path):
     blood_restore = tk.BooleanVar()
     vocal_restore = tk.BooleanVar()
     ex_skill = tk.BooleanVar()
+    bn_viruses = tk.BooleanVar()
 
     tk.Checkbutton(patch_window, text="Blood Restoration", variable=blood_restore).pack(anchor="w")
-    if game_name in ['Zero2', 'Zero3']:
+    if game_name in ['Zero 2', 'Zero 3']:
         tk.Checkbutton(patch_window, text="Get EX Skill Regardless of Rank", variable=ex_skill).pack(anchor="w")
-    if game_name in ['Zero4']:
-        tk.Checkbutton(patch_window, text="Vocal Restoration", variable=vocal_restore).pack(anchor="w")
+    if game_name in ['Zero 3']:
+        tk.Checkbutton(patch_window, text="Battle Network Viruses Without Game Link", variable=bn_viruses).pack(anchor="w")
+    if game_name in ['Zero 4']:
+        tk.Checkbutton(patch_window, text="Japanese Vocal Restoration", variable=vocal_restore).pack(anchor="w")
 
     tk.Button(patch_window, text="Apply Patches", command=apply_patches).pack(pady=10)
     patch_window.wait_window(patch_window)
@@ -143,16 +158,16 @@ zero2_img = load_image("images/zero2.png")
 zero3_img = load_image("images/zero3.png")
 zero4_img = load_image("images/zero4.png")
 
-button1 = tk.Button(frame1, image=zero1_img, command=lambda: open_file('Zero1'))
+button1 = tk.Button(frame1, image=zero1_img, command=lambda: open_file('Zero 1'))
 button1.grid(row=0, column=0, padx=10, pady=10)
 
-button2 = tk.Button(frame1, image=zero2_img, command=lambda: open_file('Zero2'))
+button2 = tk.Button(frame1, image=zero2_img, command=lambda: open_file('Zero 2'))
 button2.grid(row=0, column=1, padx=10, pady=10)
 
-button3 = tk.Button(frame1, image=zero3_img, command=lambda: open_file('Zero3'))
+button3 = tk.Button(frame1, image=zero3_img, command=lambda: open_file('Zero 3'))
 button3.grid(row=0, column=2, padx=10, pady=10)
 
-button4 = tk.Button(frame1, image=zero4_img, command=lambda: open_file('Zero4'))
+button4 = tk.Button(frame1, image=zero4_img, command=lambda: open_file('Zero 4'))
 button4.grid(row=0, column=3, padx=10, pady=10)
 
 root.mainloop()

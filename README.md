@@ -14,4 +14,14 @@
 * Have fun playing the Mega Man Zero games with some QoL tweaks!
 
 ### Credits
-TODO
+* Credit to acediez for their EX skill patches for Zero 2 and 3
+  * Patches Link: https://www.romhacking.net/forum/index.php?topic=27346.0
+* Credit to acediez for their Battle Network Virus patch for Zero 3
+  * Patches Link: https://www.romhacking.net/forum/index.php?topic=27346.0
+* Credit to SCD for the blood restoration mods for Zero 1, 2, and 3
+  * Patch Links
+    * https://www.romhacking.net/hacks/3723/
+    * https://www.romhacking.net/hacks/3738/
+    * https://www.romhacking.net/hacks/3741/
+* Credit to emerilfryer for the blood and vocal restoration for Zero 4
+  * Patch Link: https://www.romhacking.net/hacks/4228/
