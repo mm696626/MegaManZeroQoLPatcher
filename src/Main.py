@@ -8,6 +8,7 @@ import os
 import shutil
 
 import romByteModifier
+import weapon_exp_editor
 
 EXPECTED_MD5 = {
     'Zero 1': ['b24a17d080a01a404cbf018ba42b9803'],
@@ -119,6 +120,10 @@ def show_patch_options(game_name, file_path, save_path):
 
         romByteModifier.apply_ips_patches(file_path, save_path, patch_list)
         patch_window.destroy()
+
+        if modify_weapon_exp.get():
+            weapon_exp_editor.open_weapon_exp_editor(save_path, game_name)
+
         messagebox.showinfo("Done", f"Patching for {game_name} is complete!")
 
     def on_window_close():
@@ -134,12 +139,14 @@ def show_patch_options(game_name, file_path, save_path):
     bn_viruses = tk.BooleanVar()
     retry_chips = tk.BooleanVar()
     no_elf_penalty = tk.BooleanVar()
+    modify_weapon_exp = tk.BooleanVar()
 
     tk.Checkbutton(patch_window, text="Blood Restoration", variable=blood_restore).pack(anchor="w")
     if game_name in ['Zero 1']:
         tk.Checkbutton(patch_window, text="9 Retry Chips at Start of Game", variable=retry_chips).pack(anchor="w")
     if game_name in ['Zero 1', 'Zero 2']:
         tk.Checkbutton(patch_window, text="Remove Cyber-Elf Penalty on Rank", variable=no_elf_penalty).pack(anchor="w")
+        tk.Checkbutton(patch_window, text="Modify Weapon EXP", variable=modify_weapon_exp).pack(anchor="w")
     if game_name in ['Zero 2', 'Zero 3']:
         tk.Checkbutton(patch_window, text="Get EX Skill Regardless of Rank", variable=ex_skill).pack(anchor="w")
     if game_name in ['Zero 3']:
