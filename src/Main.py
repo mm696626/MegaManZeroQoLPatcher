@@ -7,6 +7,7 @@ import hashlib
 import os
 import shutil
 
+import cyber_elf_cost_editor
 import romByteModifier
 import weapon_exp_editor
 
@@ -124,6 +125,9 @@ def show_patch_options(game_name, file_path, save_path):
         if modify_weapon_exp.get():
             weapon_exp_editor.open_weapon_exp_editor(save_path, game_name)
 
+        if modify_cyber_elf_costs.get():
+            cyber_elf_cost_editor.open_cyber_elf_cost_editor(save_path, game_name)
+
         messagebox.showinfo("Done", f"Patching for {game_name} is complete!")
 
     def on_window_close():
@@ -140,6 +144,7 @@ def show_patch_options(game_name, file_path, save_path):
     retry_chips = tk.BooleanVar()
     no_elf_penalty = tk.BooleanVar()
     modify_weapon_exp = tk.BooleanVar()
+    modify_cyber_elf_costs = tk.BooleanVar()
 
     tk.Checkbutton(patch_window, text="Blood Restoration", variable=blood_restore).pack(anchor="w")
     if game_name in ['Zero 1']:
@@ -147,6 +152,8 @@ def show_patch_options(game_name, file_path, save_path):
     if game_name in ['Zero 1', 'Zero 2']:
         tk.Checkbutton(patch_window, text="Remove Cyber-Elf Penalty on Rank", variable=no_elf_penalty).pack(anchor="w")
         tk.Checkbutton(patch_window, text="Modify Weapon EXP", variable=modify_weapon_exp).pack(anchor="w")
+    if game_name in ['Zero 1', 'Zero 4']:
+        tk.Checkbutton(patch_window, text="Modify Cyber-Elf Costs", variable=modify_cyber_elf_costs).pack(anchor="w")
     if game_name in ['Zero 2', 'Zero 3']:
         tk.Checkbutton(patch_window, text="Get EX Skill Regardless of Rank", variable=ex_skill).pack(anchor="w")
     if game_name in ['Zero 3']:
