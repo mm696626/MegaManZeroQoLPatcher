@@ -3,6 +3,7 @@ from tkinter import messagebox
 
 cyber_elf_cost_offsets = {
     'Zero 1': (0x2B727C, 0x2B729A),
+    'Zero 2': (0x34A5C8, 0x34A5E5),
     'Zero 4': (0x886198, 0x8861A5)
 }
 

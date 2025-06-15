@@ -29,3 +29,7 @@
     * https://www.romhacking.net/hacks/3741/
 * Credit to emerilfryer for the blood and vocal restoration for Zero 4
   * Patch Link: https://www.romhacking.net/hacks/4228/
+* Credit to acediez and PowerPanda for documenting out offsets for various things
+  * https://www.romhacking.net/forum/index.php?topic=27346.0
+* Credit to myself for finding the offset for Zero 4 Croire level up costs
+  * For US ROM at least, it's at 0x886198 and lasts for 14 bytes

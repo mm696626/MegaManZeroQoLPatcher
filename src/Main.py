@@ -152,7 +152,7 @@ def show_patch_options(game_name, file_path, save_path):
     if game_name in ['Zero 1', 'Zero 2']:
         tk.Checkbutton(patch_window, text="Remove Cyber-Elf Penalty on Rank", variable=no_elf_penalty).pack(anchor="w")
         tk.Checkbutton(patch_window, text="Modify Weapon EXP", variable=modify_weapon_exp).pack(anchor="w")
-    if game_name in ['Zero 1', 'Zero 4']:
+    if game_name in ['Zero 1', 'Zero 2', 'Zero 4']:
         tk.Checkbutton(patch_window, text="Modify Cyber-Elf Costs", variable=modify_cyber_elf_costs).pack(anchor="w")
     if game_name in ['Zero 2', 'Zero 3']:
         tk.Checkbutton(patch_window, text="Get EX Skill Regardless of Rank", variable=ex_skill).pack(anchor="w")
