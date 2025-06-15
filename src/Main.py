@@ -88,6 +88,10 @@ def show_patch_options(game_name, file_path, save_path):
         patch_list = []
 
         if game_name == 'Zero 1':
+            if no_elf_penalty.get():
+                patch_list.append("patches/mmz1_mission_penalty.ips")
+            if retry_chips.get():
+                patch_list.append("patches/mmz1_9_retries.ips")
             if blood_restore.get():
                 patch_list.append("patches/mmz1_blood.ips")
 
@@ -96,6 +100,8 @@ def show_patch_options(game_name, file_path, save_path):
                 patch_list.append("patches/mmz2_blood.ips")
             if ex_skill.get():
                 patch_list.append("patches/mmz2_easyexskill.ips")
+            if no_elf_penalty.get():
+                patch_list.append("patches/mmz2_mission_penalty.ips")
 
         elif game_name == 'Zero 3':
             if blood_restore.get():
@@ -126,8 +132,14 @@ def show_patch_options(game_name, file_path, save_path):
     vocal_restore = tk.BooleanVar()
     ex_skill = tk.BooleanVar()
     bn_viruses = tk.BooleanVar()
+    retry_chips = tk.BooleanVar()
+    no_elf_penalty = tk.BooleanVar()
 
     tk.Checkbutton(patch_window, text="Blood Restoration", variable=blood_restore).pack(anchor="w")
+    if game_name in ['Zero 1']:
+        tk.Checkbutton(patch_window, text="9 Retry Chips at Start of Game", variable=retry_chips).pack(anchor="w")
+    if game_name in ['Zero 1', 'Zero 2']:
+        tk.Checkbutton(patch_window, text="Remove Cyber-Elf Penalty on Rank", variable=no_elf_penalty).pack(anchor="w")
     if game_name in ['Zero 2', 'Zero 3']:
         tk.Checkbutton(patch_window, text="Get EX Skill Regardless of Rank", variable=ex_skill).pack(anchor="w")
     if game_name in ['Zero 3']:

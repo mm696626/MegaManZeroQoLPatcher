@@ -18,6 +18,10 @@
   * Patches Link: https://www.romhacking.net/forum/index.php?topic=27346.0
 * Credit to acediez for their Battle Network Virus patch for Zero 3
   * Patches Link: https://www.romhacking.net/forum/index.php?topic=27346.0
+* Credit to PowerPanda for some of the patches from the Revisited mods for Zero 1 and 2
+  * Patch Links
+    * https://www.romhacking.net/hacks/7115/
+    * https://www.romhacking.net/hacks/7119/
 * Credit to SCD for the blood restoration mods for Zero 1, 2, and 3
   * Patch Links
     * https://www.romhacking.net/hacks/3723/
