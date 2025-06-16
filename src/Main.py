@@ -8,7 +8,7 @@ import os
 import shutil
 
 import cyber_elf_cost_editor
-import ips_patch_applier
+import ips_patch_utils
 import weapon_exp_editor
 
 EXPECTED_MD5 = {
@@ -119,7 +119,7 @@ def show_patch_options(game_name, file_path, save_path):
             if vocal_restore.get():
                 patch_list.append("patches/mmz4_vocals.ips")
 
-        ips_patch_applier.apply_ips_patches(file_path, save_path, patch_list)
+        ips_patch_utils.apply_ips_patches(file_path, save_path, patch_list)
         patch_window.destroy()
 
         if modify_weapon_exp.get():
@@ -129,6 +129,20 @@ def show_patch_options(game_name, file_path, save_path):
             cyber_elf_cost_editor.open_cyber_elf_cost_editor(save_path, game_name)
 
         messagebox.showinfo("Done", f"Patching for {game_name} is complete!")
+
+        create_patch = messagebox.askyesno(
+            "Create IPS Patch?",
+            "Do you want to create an IPS patch?"
+        )
+        if create_patch:
+            patch_save_path = filedialog.asksaveasfilename(
+                title="Save IPS Patch File",
+                defaultextension=".ips",
+                filetypes=[("IPS Patch", "*.ips")]
+            )
+            if patch_save_path:
+                ips_patch_utils.create_ips_patch(file_path, save_path, patch_save_path)
+                messagebox.showinfo("Done", f"IPS patch for {game_name} has been created!")
 
     def on_window_close():
         patch_window.destroy()
