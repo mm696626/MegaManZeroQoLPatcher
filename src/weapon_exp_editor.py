@@ -51,13 +51,13 @@ def open_weapon_exp_editor(rom_path, game_name):
                         val = int(val_str)
 
                         if length == 1 or (length > 1 and len(entries[weapon]) == 1 and length == 1):
-                            if not (0 <= val <= 255):
-                                raise ValueError(f"Value {val} for {weapon} must be between 0 and 255.")
+                            if not (1 <= val <= 255):
+                                raise ValueError(f"Value {val} for {weapon} must be between 1 and 255.")
                             f.write(bytes([val]))
 
                         elif length > 1:
-                            if not (0 <= val <= 65535):
-                                raise ValueError(f"Value {val} for {weapon} must be between 0 and 65535.")
+                            if not (1 <= val <= 65535):
+                                raise ValueError(f"Value {val} for {weapon} must be between 1 and 65535.")
                             f.write(val.to_bytes(2, 'little'))
 
             messagebox.showinfo("Saved", "Weapon EXP values updated successfully.")
