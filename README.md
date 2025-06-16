@@ -1,7 +1,7 @@
 # MegaManZeroQoLPatcher
 
-### Mega Man Zero Series QoL Patcher
-* A tool to modify the Mega Man Zero games with various QoL tweaks such as reducing weapon requirements or making EX skills not require A rank or higher
+### Mega Man Zero Series Quality of Life Patcher
+* A tool to modify the Mega Man Zero games with various Quality of Life (QoL) tweaks such as reducing weapon requirements or making EX skills not require A rank or higher
 
 ### Setup to get this tool working
 * Have one of the following ROMs
