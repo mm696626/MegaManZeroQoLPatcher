@@ -3,19 +3,19 @@ from tkinter import messagebox
 
 weapon_offsets = {
     'Zero 1': {
-        'buster': (0x2A8168, 4),
-        'saber': (0x2A8184, 8),
-        'rod': (0x2A81BE, 8),
-        'shield': (0x2A81D6, 4),
-        'buster_shot_up': (0x188A2, 1),
-        'air_saber': (0x18A60, 1),
-        'dash_saber': (0x18A1C, 1),
+        'Buster Shot': (0x2A8168, 4),
+        'Z-Saber': (0x2A8184, 8),
+        'Triple Rod': (0x2A81BE, 8),
+        'Shield Boomerang': (0x2A81D6, 4),
+        'Buster 4 Shot Upgrade': (0x188A2, 1),
+        'Air Spin Slash': (0x18A60, 1),
+        'Dash Spin Slash': (0x18A1C, 1),
     },
     'Zero 2': {
-        'buster': (0x3359B4, 4),
-        'saber': (0x3359C4, 8),
-        'rod': (0x3359DA, 4),
-        'shield': (0x3359E8, 4),
+        'Buster Shot': (0x3359B4, 4),
+        'Z-Saber': (0x3359C4, 8),
+        'Chain Rod': (0x3359DA, 4),
+        'Shield Boomerang': (0x3359E8, 4),
     }
 }
 
@@ -72,7 +72,7 @@ def open_weapon_exp_editor(rom_path, game_name):
 
     row = 0
     for weapon, vars_list in entries.items():
-        tk.Label(editor, text=weapon.capitalize()).grid(row=row, column=0, sticky="w", pady=4)
+        tk.Label(editor, text=weapon).grid(row=row, column=0, sticky="w", pady=4)
         for i, var in enumerate(vars_list):
             tk.Entry(editor, textvariable=var, width=6).grid(row=row, column=i+1, padx=2)
         row += 1
