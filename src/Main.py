@@ -8,7 +8,7 @@ import os
 import shutil
 
 import cyber_elf_cost_editor
-import romByteModifier
+import ips_patch_applier
 import weapon_exp_editor
 
 EXPECTED_MD5 = {
@@ -119,7 +119,7 @@ def show_patch_options(game_name, file_path, save_path):
             if vocal_restore.get():
                 patch_list.append("patches/mmz4_vocals.ips")
 
-        romByteModifier.apply_ips_patches(file_path, save_path, patch_list)
+        ips_patch_applier.apply_ips_patches(file_path, save_path, patch_list)
         patch_window.destroy()
 
         if modify_weapon_exp.get():
