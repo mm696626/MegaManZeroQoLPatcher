@@ -171,7 +171,7 @@ def show_patch_options(game_name, file_path, save_path):
     patch_window.wait_window(patch_window)
 
 root = tk.Tk()
-root.title("Mega Man Zero Series QoL Patcher")
+root.title("Mega Man Zero Series Quality of Life Patcher")
 icon = PhotoImage(file='images/zero-icon.png')
 root.iconphoto(True, icon)
 
