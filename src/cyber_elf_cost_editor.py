@@ -11,7 +11,11 @@ cyber_elf_cost_offsets = {
 def open_cyber_elf_cost_editor(rom_path, game_name):
 
     editor = tk.Toplevel()
-    editor.title(f"Edit Cyber-Elf Costs - {game_name}")
+    if game_name == 'Zero 4':
+        editor.title("Edit Croire Levels - Zero 4")
+    else:
+        editor.title(f"Edit Cyber-Elf Costs - {game_name}")
+
     entries = []
 
     start_offset, end_offset = cyber_elf_cost_offsets[game_name]
