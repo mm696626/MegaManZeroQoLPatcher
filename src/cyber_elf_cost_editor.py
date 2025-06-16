@@ -56,7 +56,8 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
     read_values()
 
     for display_row, (index, var) in enumerate(entries):
-        tk.Label(editor, text=f"Elf {display_row + 1}").grid(row=display_row, column=0, sticky="w", pady=2)
+        label_text = f"Croire Level {display_row + 1}" if game_name == 'Zero 4' else f"Elf {display_row + 1}"
+        tk.Label(editor, text=label_text).grid(row=display_row, column=0, sticky="w", pady=2)
         tk.Entry(editor, textvariable=var, width=8).grid(row=display_row, column=1, padx=4)
 
     tk.Button(editor, text="Save and Close", command=write_values).grid(row=len(entries) + 1, column=0, columnspan=2, pady=10)
