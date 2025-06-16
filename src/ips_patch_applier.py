@@ -21,15 +21,3 @@ def apply_ips_patches(file_path, save_path, ips_patch_files):
 
     except Exception as e:
         print(f"Error: {e}")
-
-def create_ips_patch(file_path, save_path, output_patch_path):
-    try:
-        with open(file_path, 'rb') as old_file, open(save_path, 'rb') as new_file:
-            patch = ips.Patch.create(old_file, new_file)
-
-        with open(output_patch_path, 'wb') as f:
-            f.write(bytes(patch))
-
-        print(f"Patch created: {output_patch_path}")
-    except Exception as e:
-        print(f"Error creating patch: {e}")
