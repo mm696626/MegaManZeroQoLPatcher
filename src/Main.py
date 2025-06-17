@@ -79,10 +79,6 @@ def open_file(game_name):
         if not save_path:
             return
 
-        if os.path.abspath(save_path) == os.path.abspath(file_path):
-            messagebox.showerror("Invalid Save Path","The save path cannot be the same as the original ROM file path.")
-            return
-
         copy_file(file_path, save_path)
         show_patch_options(game_name, file_path, save_path)
     else:
