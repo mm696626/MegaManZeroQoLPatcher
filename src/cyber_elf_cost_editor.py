@@ -62,7 +62,7 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
         for i, (index, var) in enumerate(entries):
             try:
                 val = int(var.get())
-                scaled = max(1, int(val * factor))
+                scaled = min(65535, max(1, int(val * factor)))
                 var.set(str(scaled))
             except ValueError:
                 pass
@@ -70,6 +70,28 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
     def reset_values():
         for i, (_, var) in enumerate(entries):
             var.set(str(original_values[i]))
+
+    def prompt_custom_scale():
+        popup = tk.Toplevel(editor)
+        popup.title("Custom Scale Factor")
+        popup.grab_set()
+
+        tk.Label(popup, text="Enter custom scale factor (> 0):").pack(padx=10, pady=5)
+        entry = tk.Entry(popup)
+        entry.pack(padx=10, pady=5)
+
+        def apply():
+            try:
+                val = float(entry.get())
+                if val <= 0:
+                    raise ValueError
+                apply_scale(val)
+                popup.destroy()
+            except ValueError:
+                messagebox.showerror("Invalid Input", "Please enter a positive number greater than 0.")
+
+        tk.Button(popup, text="Apply", command=apply).pack(pady=10)
+
 
     read_values()
 
@@ -89,9 +111,10 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
     scale_frame.grid(row=last_row + 1, column=0, columnspan=10, pady=10)
 
     tk.Label(scale_frame, text="Scale: ").pack(side=tk.LEFT)
-    for scale in [1/10, 1/6, 1/5, 1/4, 1/3, 1/2, 2/3, 3/4]:
+    for scale in [1/10, 1/6, 1/5, 1/4, 1/3, 1/2, 2/3, 3/4, 4/3, 3/2, 7/4, 2]:
         tk.Button(scale_frame, text=f"x{scale:.2f}", command=lambda s=scale: apply_scale(s)).pack(side=tk.LEFT, padx=2)
 
+    tk.Button(scale_frame, text="Custom", command=prompt_custom_scale).pack(side=tk.LEFT, padx=10)
     tk.Button(scale_frame, text="Reset", command=reset_values).pack(side=tk.LEFT, padx=10)
 
     tk.Button(editor, text="Save and Close", command=write_values).grid(row=last_row + 2, column=0, columnspan=10, pady=10)
