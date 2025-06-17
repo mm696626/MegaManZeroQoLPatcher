@@ -97,7 +97,7 @@ def open_weapon_exp_editor(rom_path, game_name):
     scale_frame.grid(row=row, column=0, columnspan=5, pady=5)
 
     tk.Label(scale_frame, text="Scale: ").pack(side=tk.LEFT)
-    for scale in [1/10, 1/6, 1/5, 1/4, 1/3, 1/2]:
+    for scale in [1/10, 1/6, 1/5, 1/4, 1/3, 1/2, 2/3, 3/4]:
         tk.Button(scale_frame, text=f"x{scale:.2f}", command=lambda s=scale: apply_scale(s)).pack(side=tk.LEFT, padx=2)
 
     tk.Button(scale_frame, text="Reset", command=reset_values).pack(side=tk.LEFT, padx=10)

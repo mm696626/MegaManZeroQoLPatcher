@@ -73,26 +73,23 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
 
     read_values()
 
-    if game_name == 'Zero 4':
-        for display_row, (index, var) in enumerate(entries):
-            label_text = f"Croire Level {display_row + 1}"
-            tk.Label(editor, text=label_text).grid(row=display_row, column=0, sticky="w", pady=2)
-            tk.Entry(editor, textvariable=var, width=8).grid(row=display_row, column=1, padx=4)
-        last_row = len(entries)
-    else:
-        for i, (index, var) in enumerate(entries):
-            row = i // 5
-            col = (i % 5) * 2
+    for i, (index, var) in enumerate(entries):
+        row = i // 3
+        col = (i % 3) * 2
+        if game_name == 'Zero 4':
+            label_text = f"Croire Level {i + 1}"
+        else:
             label_text = f"Elf {i + 1}"
-            tk.Label(editor, text=label_text).grid(row=row, column=col, sticky="e", padx=2, pady=2)
-            tk.Entry(editor, textvariable=var, width=8).grid(row=row, column=col + 1, padx=2)
-        last_row = (len(entries) - 1) // 5 + 1
+        tk.Label(editor, text=label_text).grid(row=row, column=col, sticky="e", padx=2, pady=2)
+        tk.Entry(editor, textvariable=var, width=8).grid(row=row, column=col + 1, padx=2)
+    last_row = (len(entries) - 1) // 3 + 1
+
 
     scale_frame = tk.Frame(editor)
     scale_frame.grid(row=last_row + 1, column=0, columnspan=10, pady=10)
 
     tk.Label(scale_frame, text="Scale: ").pack(side=tk.LEFT)
-    for scale in [1/10, 1/6, 1/5, 1/4, 1/3, 1/2]:
+    for scale in [1/10, 1/6, 1/5, 1/4, 1/3, 1/2, 2/3, 3/4]:
         tk.Button(scale_frame, text=f"x{scale:.2f}", command=lambda s=scale: apply_scale(s)).pack(side=tk.LEFT, padx=2)
 
     tk.Button(scale_frame, text="Reset", command=reset_values).pack(side=tk.LEFT, padx=10)
