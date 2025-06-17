@@ -9,7 +9,6 @@ cyber_elf_cost_offsets = {
 }
 
 def open_cyber_elf_cost_editor(rom_path, game_name):
-
     editor = tk.Toplevel()
     if game_name == 'Zero 4':
         editor.title("Edit Croire Levels - Zero 4")
@@ -17,6 +16,7 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
         editor.title(f"Edit Cyber-Elf Costs - {game_name}")
 
     entries = []
+    original_values = []
 
     start_offset, end_offset = cyber_elf_cost_offsets[game_name]
     num_entries = (end_offset - start_offset) // 2 + 1
@@ -32,12 +32,13 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
                 if val != 0:
                     var = tk.StringVar(value=str(val))
                     entries.append((i, var))
+                    original_values.append(val)
                     display_indices.append(i)
 
     def write_values():
         try:
             with open(rom_path, 'r+b') as f:
-                for index, var in entries:
+                for (index, var) in entries:
                     val_str = var.get().strip()
                     if not val_str.isdigit():
                         raise ValueError(f"Invalid input at entry {index + 1}. Must be a non-negative integer.")
@@ -57,6 +58,19 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
         except Exception as e:
             messagebox.showerror("Error", f"Unexpected error:\n{e}")
 
+    def apply_scale(factor):
+        for i, (index, var) in enumerate(entries):
+            try:
+                val = int(var.get())
+                scaled = max(1, int(val * factor))
+                var.set(str(scaled))
+            except ValueError:
+                pass
+
+    def reset_values():
+        for i, (_, var) in enumerate(entries):
+            var.set(str(original_values[i]))
+
     read_values()
 
     if game_name == 'Zero 4':
@@ -64,14 +78,26 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
             label_text = f"Croire Level {display_row + 1}"
             tk.Label(editor, text=label_text).grid(row=display_row, column=0, sticky="w", pady=2)
             tk.Entry(editor, textvariable=var, width=8).grid(row=display_row, column=1, padx=4)
+        last_row = len(entries)
     else:
         for i, (index, var) in enumerate(entries):
             row = i // 5
-            col = (i % 5) * 2  # label and entry side by side
+            col = (i % 5) * 2
             label_text = f"Elf {i + 1}"
             tk.Label(editor, text=label_text).grid(row=row, column=col, sticky="e", padx=2, pady=2)
             tk.Entry(editor, textvariable=var, width=8).grid(row=row, column=col + 1, padx=2)
+        last_row = (len(entries) - 1) // 5 + 1
 
-    tk.Button(editor, text="Save and Close", command=write_values).grid(row=len(entries) + 1, column=0, columnspan=2, pady=10)
+    scale_frame = tk.Frame(editor)
+    scale_frame.grid(row=last_row + 1, column=0, columnspan=10, pady=10)
+
+    tk.Label(scale_frame, text="Scale: ").pack(side=tk.LEFT)
+    for scale in [1/10, 1/6, 1/5, 1/4, 1/3, 1/2]:
+        tk.Button(scale_frame, text=f"x{scale:.2f}", command=lambda s=scale: apply_scale(s)).pack(side=tk.LEFT, padx=2)
+
+    tk.Button(scale_frame, text="Reset", command=reset_values).pack(side=tk.LEFT, padx=10)
+
+    tk.Button(editor, text="Save and Close", command=write_values).grid(row=last_row + 2, column=0, columnspan=10, pady=10)
     editor.grab_set()
     editor.wait_window(editor)
+

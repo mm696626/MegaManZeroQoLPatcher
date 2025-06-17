@@ -23,6 +23,7 @@ def open_weapon_exp_editor(rom_path, game_name):
     editor = tk.Toplevel()
     editor.title(f"Modify Weapon EXP - {game_name}")
     entries = {}
+    original_values = {}
 
     def read_values():
         with open(rom_path, 'rb') as f:
@@ -30,12 +31,14 @@ def open_weapon_exp_editor(rom_path, game_name):
                 f.seek(offset)
                 data = f.read(length)
                 if length > 1:
-                    entries[weapon] = [
-                        tk.StringVar(value=str(int.from_bytes(data[i:i+2], 'little')))
-                        for i in range(0, length, 2)
+                    values = [
+                        int.from_bytes(data[i:i+2], 'little') for i in range(0, length, 2)
                     ]
                 else:
-                    entries[weapon] = [tk.StringVar(value=str(data[0]))]
+                    values = [data[0]]
+
+                original_values[weapon] = values[:]
+                entries[weapon] = [tk.StringVar(value=str(val)) for val in values]
 
     def write_values():
         try:
@@ -47,14 +50,12 @@ def open_weapon_exp_editor(rom_path, game_name):
                         if not val_str.isdigit():
                             raise ValueError(
                                 f"Invalid value '{val_str}' for {weapon}. Only non-negative integers are allowed.")
-
                         val = int(val_str)
 
                         if length == 1 or (length > 1 and len(entries[weapon]) == 1 and length == 1):
                             if not (1 <= val <= 255):
                                 raise ValueError(f"Value {val} for {weapon} must be between 1 and 255.")
                             f.write(bytes([val]))
-
                         elif length > 1:
                             if not (1 <= val <= 65535):
                                 raise ValueError(f"Value {val} for {weapon} must be between 1 and 65535.")
@@ -68,6 +69,21 @@ def open_weapon_exp_editor(rom_path, game_name):
         except Exception as e:
             messagebox.showerror("Error", f"An unexpected error occurred:\n{e}")
 
+    def apply_scale(factor):
+        for weapon, vars_list in entries.items():
+            for i, var in enumerate(vars_list):
+                try:
+                    val = int(var.get())
+                    scaled = max(1, int(val * factor))
+                    var.set(str(scaled))
+                except ValueError:
+                    pass
+
+    def reset_values():
+        for weapon, original in original_values.items():
+            for i, val in enumerate(original):
+                entries[weapon][i].set(str(val))
+
     read_values()
 
     row = 0
@@ -77,6 +93,17 @@ def open_weapon_exp_editor(rom_path, game_name):
             tk.Entry(editor, textvariable=var, width=6).grid(row=row, column=i+1, padx=2)
         row += 1
 
+    scale_frame = tk.Frame(editor)
+    scale_frame.grid(row=row, column=0, columnspan=5, pady=5)
+
+    tk.Label(scale_frame, text="Scale: ").pack(side=tk.LEFT)
+    for scale in [1/10, 1/6, 1/5, 1/4, 1/3, 1/2]:
+        tk.Button(scale_frame, text=f"x{scale:.2f}", command=lambda s=scale: apply_scale(s)).pack(side=tk.LEFT, padx=2)
+
+    tk.Button(scale_frame, text="Reset", command=reset_values).pack(side=tk.LEFT, padx=10)
+
+    row += 1
     tk.Button(editor, text="Save and Close", command=write_values).grid(row=row, column=0, columnspan=5, pady=10)
+
     editor.grab_set()
     editor.wait_window(editor)
