@@ -144,22 +144,22 @@ def show_patch_options(game_name, file_path, save_path):
     modify_weapon_exp = tk.BooleanVar()
     modify_cyber_elf_costs = tk.BooleanVar()
 
-    tk.Checkbutton(patch_window, text="Blood Restoration", variable=blood_restore).pack(anchor="w")
     if game_name in ['Zero 1']:
         tk.Checkbutton(patch_window, text="9 Retry Chips at Start of Game", variable=retry_chips).pack(anchor="w")
-    if game_name in ['Zero 1', 'Zero 2']:
-        tk.Checkbutton(patch_window, text="Remove Cyber-Elf Penalty on Rank", variable=no_elf_penalty).pack(anchor="w")
-        tk.Checkbutton(patch_window, text="Modify Weapon EXP", variable=modify_weapon_exp).pack(anchor="w")
+    if game_name in ['Zero 3']:
+        tk.Checkbutton(patch_window, text="Battle Network Viruses Without Game Link", variable=bn_viruses).pack(anchor="w")
+    tk.Checkbutton(patch_window, text="Blood Restoration", variable=blood_restore).pack(anchor="w")
+    if game_name in ['Zero 2', 'Zero 3']:
+        tk.Checkbutton(patch_window, text="Get EX Skill Regardless of Rank", variable=ex_skill).pack(anchor="w")
+    if game_name in ['Zero 4']:
+        tk.Checkbutton(patch_window, text="Japanese Vocal Restoration", variable=vocal_restore).pack(anchor="w")
     if game_name in ['Zero 1', 'Zero 2', 'Zero 3']:
         tk.Checkbutton(patch_window, text="Modify Cyber-Elf Costs", variable=modify_cyber_elf_costs).pack(anchor="w")
     if game_name in ['Zero 4']:
         tk.Checkbutton(patch_window, text="Modify Croire Costs", variable=modify_cyber_elf_costs).pack(anchor="w")
-    if game_name in ['Zero 2', 'Zero 3']:
-        tk.Checkbutton(patch_window, text="Get EX Skill Regardless of Rank", variable=ex_skill).pack(anchor="w")
-    if game_name in ['Zero 3']:
-        tk.Checkbutton(patch_window, text="Battle Network Viruses Without Game Link", variable=bn_viruses).pack(anchor="w")
-    if game_name in ['Zero 4']:
-        tk.Checkbutton(patch_window, text="Japanese Vocal Restoration", variable=vocal_restore).pack(anchor="w")
+    if game_name in ['Zero 1', 'Zero 2']:
+        tk.Checkbutton(patch_window, text="Modify Weapon EXP", variable=modify_weapon_exp).pack(anchor="w")
+        tk.Checkbutton(patch_window, text="Remove Cyber-Elf Penalty on Rank", variable=no_elf_penalty).pack(anchor="w")
 
     tk.Button(patch_window, text="Apply Patches", command=apply_patches).pack(pady=10)
     patch_window.wait_window(patch_window)
