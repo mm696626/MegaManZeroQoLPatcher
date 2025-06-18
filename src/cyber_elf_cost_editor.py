@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+import fractions
 
 cyber_elf_cost_offsets = {
     'Zero 1': (0x2B727C, 0x2B729A),
@@ -76,22 +77,29 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
         popup.title("Custom Scale Factor")
         popup.grab_set()
 
-        tk.Label(popup, text="Enter custom scale factor (> 0):").pack(padx=10, pady=5)
+        tk.Label(popup, text="Enter custom scale factor (> 0):\n(e.g., 0.5, 3/2, 150%)").pack(padx=10, pady=5)
         entry = tk.Entry(popup)
         entry.pack(padx=10, pady=5)
 
         def apply():
             try:
-                val = float(entry.get())
-                if val <= 0:
+                input_str = entry.get().strip().replace(" ", "")
+                if input_str.endswith('%'):
+                    value = float(input_str.rstrip('%')) / 100
+                else:
+                    value = float(fractions.Fraction(input_str))
+
+                if value <= 0:
                     raise ValueError
-                apply_scale(val)
+                apply_scale(value)
                 popup.destroy()
-            except ValueError:
-                messagebox.showerror("Invalid Input", "Please enter a positive number greater than 0.")
+            except (ValueError, ZeroDivisionError):
+                messagebox.showerror(
+                    "Invalid Input",
+                    "Please enter a valid positive number, fraction (e.g., 2/3), or percent (e.g., 150%)."
+                )
 
         tk.Button(popup, text="Apply", command=apply).pack(pady=10)
-
 
     read_values()
 
@@ -111,8 +119,19 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
     scale_frame.grid(row=last_row + 1, column=0, columnspan=10, pady=10)
 
     tk.Label(scale_frame, text="Scale: ").pack(side=tk.LEFT)
-    for scale in [1/10, 1/6, 1/5, 1/4, 1/3, 1/2, 2/3, 3/4, 4/3, 3/2, 7/4, 2]:
-        tk.Button(scale_frame, text=f"x{scale:.2f}", command=lambda s=scale: apply_scale(s)).pack(side=tk.LEFT, padx=2)
+
+    scale_fractions = [
+        ("1/6", 1 / 6),
+        ("1/4", 1 / 4),
+        ("1/3", 1 / 3),
+        ("1/2", 1 / 2),
+        ("2/3", 2 / 3),
+        ("3/4", 3 / 4),
+        ("2", 2)
+    ]
+
+    for label, scale in scale_fractions:
+        tk.Button(scale_frame, text=f"x{label}", command=lambda s=scale: apply_scale(s)).pack(side=tk.LEFT, padx=2)
 
     tk.Button(scale_frame, text="Custom", command=prompt_custom_scale).pack(side=tk.LEFT, padx=10)
     tk.Button(scale_frame, text="Reset", command=reset_values).pack(side=tk.LEFT, padx=10)
