@@ -108,7 +108,7 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
         if game_name == 'Zero 4':
             label_text = f"Croire Level {i + 1}"
         else:
-            label_text = f"Elf {i + 1}"
+            label_text = f"Elf Cost {i + 1}"
         tk.Label(editor, text=label_text).grid(row=row, column=col, sticky="e", padx=2, pady=2)
         tk.Entry(editor, textvariable=var, width=8).grid(row=row, column=col + 1, padx=2)
     last_row = (len(entries) - 1) // 3 + 1
