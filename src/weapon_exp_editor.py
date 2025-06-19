@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import fractions
+import random
 
 weapon_offsets = {
     'Zero 1': {
@@ -94,6 +95,20 @@ def open_weapon_exp_editor(rom_path, game_name):
             for i, val in enumerate(original):
                 entries[weapon][i].set(str(val))
 
+    def randomize_values():
+        for weapon, vars_list in entries.items():
+            offset, length = weapon_offsets[game_name][weapon]
+            max_val = 255 if length == 1 else 2000
+            num_levels = len(vars_list)
+
+            base = random.randint(1, max(1, max_val // (num_levels + 1)))
+            values = [base]
+            for _ in range(1, num_levels):
+                increment = random.randint(1, max(1, (max_val - values[-1]) // (num_levels)))
+                values.append(min(max_val, values[-1] + increment))
+            for i, val in enumerate(values):
+                vars_list[i].set(str(val))
+
     def prompt_custom_scale():
         popup = tk.Toplevel(editor)
         popup.title("Custom EXP Scale Factor")
@@ -150,6 +165,7 @@ def open_weapon_exp_editor(rom_path, game_name):
 
     tk.Button(scale_frame, text="Custom", command=prompt_custom_scale).pack(side=tk.LEFT, padx=10)
     tk.Button(scale_frame, text="Reset", command=reset_values).pack(side=tk.LEFT, padx=10)
+    tk.Button(scale_frame, text="Randomize", command=randomize_values).pack(side=tk.LEFT, padx=10)
 
     row += 1
     tk.Button(editor, text="Save and Close", command=write_values).grid(row=row, column=0, columnspan=5, pady=10)
