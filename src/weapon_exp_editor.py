@@ -46,14 +46,23 @@ def open_weapon_exp_editor(rom_path, game_name):
             with open(rom_path, 'r+b') as f:
                 for weapon, (offset, length) in weapon_offsets[game_name].items():
                     f.seek(offset)
+                    values = []
                     for var in entries[weapon]:
                         val_str = var.get().strip()
                         if not val_str.isdigit():
                             raise ValueError(
                                 f"Invalid value '{val_str}' for {weapon}. Only non-negative integers are allowed.")
                         val = int(val_str)
+                        values.append(val)
 
-                        if length == 1 or (length > 1 and len(entries[weapon]) == 1 and length == 1):
+                    if len(values) > 1:
+                        for i in range(1, len(values)):
+                            if values[i] < values[i - 1]:
+                                raise ValueError(
+                                    f"EXP for {weapon} must not decrease (level {i + 1} < level {i}).")
+
+                    for val in values:
+                        if length == 1 or (length > 1 and len(values) == 1 and length == 1):
                             if not (1 <= val <= 255):
                                 raise ValueError(f"Value {val} for {weapon} must be between 1 and 255.")
                             f.write(bytes([val]))
