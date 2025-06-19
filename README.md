@@ -25,7 +25,7 @@
 
 ### Why no Europe or Japanese ROM support?
 * This is a question I might get if someone uses this. The answer is that this is for multiple reasons
-  * While Europe and USA Zero 2 is mostly identical and would work with this patcher, Zero 3 and 4 are not and would break the ROM if it's not US. The patches and hex offsets this tool uses are based on the US ROM and are vastly different since the Zero 3 and 4 ROMs are very different internally
+  * While Europe and USA Zero 2 is mostly identical and would work with this patcher, Zero 3 and 4 are not and would break the ROM if it's not USA. The patches and hex offsets this tool uses are based on the USA ROM and are vastly different since the Zero 3 and 4 ROMs are very different internally
   * Japanese ROM support would be pointless to me and this tools use since everything I and most people would want that was removed from the international versions can be patched back in
 * While I could add support for these in the future, it's not a goal of this project
 
