@@ -29,8 +29,8 @@
     * https://www.romhacking.net/hacks/3741/
 * Credit to emerilfryer for the blood and vocal restoration for Zero 4
   * Patch Link: https://www.romhacking.net/hacks/4228/
-* Credit to acediez and PowerPanda for documenting out offsets for various things
+* Credit to acediez and PowerPanda for documenting offsets for various things
   * https://www.romhacking.net/forum/index.php?topic=27346.0
 * Credit to myself for finding the offset for Zero 3 Cyber-Elf costs and Zero 4 Croire level up costs
-  * For US Zero 3 ROM at least, it's at 0x36E2C4 and lasts until offset 0x36E30B
-  * For US Zero 4 ROM at least, it's at 0x886198 and lasts until offset 0x8861A5
+  * For the US Zero 3 ROM at least, it's at 0x36E2C4 and lasts until offset 0x36E30B
+  * For the US Zero 4 ROM at least, it's at 0x886198 and lasts until offset 0x8861A5
