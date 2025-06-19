@@ -77,6 +77,12 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
             val = random.randint(1, 4000)
             var.set(str(val))
 
+    def shuffle_values():
+        values = [int(var.get()) for _, var in entries]
+        random.shuffle(values)
+        for (_, var), val in zip(entries, values):
+            var.set(str(val))
+
     def prompt_custom_scale():
         popup = tk.Toplevel(editor)
         popup.title("Custom Cost Scale Factor")
@@ -139,6 +145,7 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
     tk.Button(scale_frame, text="Custom", command=prompt_custom_scale).pack(side=tk.LEFT, padx=10)
     tk.Button(scale_frame, text="Reset", command=reset_values).pack(side=tk.LEFT, padx=10)
     tk.Button(scale_frame, text="Randomize", command=randomize_values).pack(side=tk.LEFT, padx=10)
+    tk.Button(scale_frame, text="Shuffle", command=shuffle_values).pack(side=tk.LEFT, padx=10)
 
     tk.Button(editor, text="Save and Close", command=write_values).grid(row=last_row + 2, column=0, columnspan=10, pady=10)
     editor.grab_set()
