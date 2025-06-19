@@ -51,7 +51,6 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
                     f.seek(start_offset + index * 2)
                     f.write(val.to_bytes(2, 'little'))
 
-            messagebox.showinfo("Saved", "Cyber-Elf cost values updated successfully.")
             editor.destroy()
 
         except ValueError as e:
@@ -74,10 +73,10 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
 
     def prompt_custom_scale():
         popup = tk.Toplevel(editor)
-        popup.title("Custom Scale Factor")
+        popup.title("Custom Cost Scale Factor")
         popup.grab_set()
 
-        tk.Label(popup, text="Enter custom scale factor (> 0):\n(e.g., 0.5, 3/2, 150%)").pack(padx=10, pady=5)
+        tk.Label(popup, text="Enter custom cost scale factor (> 0):\n(e.g., 0.5, 3/2, 150%)").pack(padx=10, pady=5)
         entry = tk.Entry(popup)
         entry.pack(padx=10, pady=5)
 
@@ -118,14 +117,12 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
     scale_frame = tk.Frame(editor)
     scale_frame.grid(row=last_row + 1, column=0, columnspan=10, pady=10)
 
-    tk.Label(scale_frame, text="Scale: ").pack(side=tk.LEFT)
+    tk.Label(scale_frame, text="Scale Costs: ").pack(side=tk.LEFT)
 
     scale_fractions = [
         ("1/6", 1 / 6),
         ("1/4", 1 / 4),
-        ("1/3", 1 / 3),
         ("1/2", 1 / 2),
-        ("2/3", 2 / 3),
         ("3/4", 3 / 4),
         ("2", 2)
     ]
