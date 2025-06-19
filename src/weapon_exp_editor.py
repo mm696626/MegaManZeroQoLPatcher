@@ -62,7 +62,7 @@ def open_weapon_exp_editor(rom_path, game_name):
                                     f"EXP for {weapon} must not decrease (level {i + 1} < level {i}).")
 
                     for val in values:
-                        if length == 1 or (length > 1 and len(values) == 1 and length == 1):
+                        if length == 1:
                             if not (1 <= val <= 255):
                                 raise ValueError(f"Value {val} for {weapon} must be between 1 and 255.")
                             f.write(bytes([val]))
