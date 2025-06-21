@@ -1,7 +1,8 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 import fractions
 import random
+import json
 
 cyber_elf_cost_offsets = {
     'Zero 1': (0x2B727C, 0x2B729A),
@@ -12,18 +13,13 @@ cyber_elf_cost_offsets = {
 
 def open_cyber_elf_cost_editor(rom_path, game_name):
     editor = tk.Toplevel()
-    if game_name == 'Zero 4':
-        editor.title("Edit Croire Levels - Zero 4")
-    else:
-        editor.title(f"Edit Cyber-Elf Costs - {game_name}")
+    editor.title("Edit Croire Levels - Zero 4" if game_name == 'Zero 4' else f"Edit Cyber-Elf Costs - {game_name}")
 
     entries = []
     original_values = []
 
     start_offset, end_offset = cyber_elf_cost_offsets[game_name]
     num_entries = (end_offset - start_offset) // 2 + 1
-
-    display_indices = []
 
     def read_values():
         with open(rom_path, 'rb') as f:
@@ -35,32 +31,27 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
                     var = tk.StringVar(value=str(val))
                     entries.append((i, var))
                     original_values.append(val)
-                    display_indices.append(i)
 
     def write_values():
         try:
             with open(rom_path, 'r+b') as f:
-                for (index, var) in entries:
+                for index, var in entries:
                     val_str = var.get().strip()
                     if not val_str.isdigit():
                         raise ValueError(f"Invalid input at entry {index + 1}. Must be a non-negative integer.")
-
                     val = int(val_str)
                     if not (1 <= val <= 65535):
                         raise ValueError(f"Value at entry {index + 1} out of range (1–65535).")
-
                     f.seek(start_offset + index * 2)
                     f.write(val.to_bytes(2, 'little'))
-
             editor.destroy()
-
         except ValueError as e:
             messagebox.showerror("Invalid Input", str(e))
         except Exception as e:
             messagebox.showerror("Error", f"Unexpected error:\n{e}")
 
     def apply_scale(factor):
-        for i, (index, var) in enumerate(entries):
+        for _, var in entries:
             try:
                 val = int(var.get())
                 scaled = min(65535, max(1, int(val * factor)))
@@ -87,7 +78,6 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
         popup = tk.Toplevel(editor)
         popup.title("Custom Cost Scale Factor")
         popup.grab_set()
-
         tk.Label(popup, text="Enter custom cost scale factor (> 0):\n(e.g., 0.5, 3/2, 150%)").pack(padx=10, pady=5)
         entry = tk.Entry(popup)
         entry.pack(padx=10, pady=5)
@@ -99,47 +89,63 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
                     value = float(input_str.rstrip('%')) / 100
                 else:
                     value = float(fractions.Fraction(input_str))
-
                 if value <= 0:
                     raise ValueError
                 apply_scale(value)
                 popup.destroy()
             except (ValueError, ZeroDivisionError):
-                messagebox.showerror(
-                    "Invalid Input",
-                    "Please enter a valid positive number, fraction (e.g., 2/3), or percent (e.g., 150%)."
-                )
+                messagebox.showerror("Invalid Input", "Enter a valid positive number, fraction (e.g., 2/3), or percent (e.g., 150%).")
 
         tk.Button(popup, text="Apply", command=apply).pack(pady=10)
 
-    read_values()
+    def export_config():
+        data = {
+            "game": game_name,
+            "values": [var.get() for _, var in entries]
+        }
+        path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
+        if path:
+            try:
+                with open(path, 'w') as f:
+                    json.dump(data, f, indent=2)
+                messagebox.showinfo("Export Complete", "Cyber-Elf/Croire costs exported successfully.")
+            except Exception as e:
+                messagebox.showerror("Error", f"Could not export config:\n{e}")
 
+    def import_config():
+        path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
+        if not path:
+            return
+        try:
+            with open(path, 'r') as f:
+                data = json.load(f)
+            if data.get("game") != game_name:
+                messagebox.showerror("Invalid Config", f"This config is for {data.get('game')}, not {game_name}.")
+                return
+            values = data.get("values", [])
+            if len(values) != len(entries):
+                messagebox.showerror("Invalid Config", "Number of entries does not match.")
+                return
+            for (_, var), val in zip(entries, values):
+                var.set(str(val))
+            messagebox.showinfo("Import Complete", "Cyber-Elf/Croire costs imported successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not import config:\n{e}")
+
+    read_values()
     for i, (index, var) in enumerate(entries):
         row = i // 3
         col = (i % 3) * 2
-        if game_name == 'Zero 4':
-            label_text = f"Croire Level {i + 1}"
-        else:
-            label_text = f"Elf Cost {i + 1}"
+        label_text = f"Croire Level {i + 1}" if game_name == 'Zero 4' else f"Elf Cost {i + 1}"
         tk.Label(editor, text=label_text).grid(row=row, column=col, sticky="e", padx=2, pady=2)
         tk.Entry(editor, textvariable=var, width=8).grid(row=row, column=col + 1, padx=2)
+
     last_row = (len(entries) - 1) // 3 + 1
-
-
     scale_frame = tk.Frame(editor)
     scale_frame.grid(row=last_row + 1, column=0, columnspan=10, pady=10)
-
     tk.Label(scale_frame, text="Scale Costs: ").pack(side=tk.LEFT)
 
-    scale_fractions = [
-        ("1/6", 1 / 6),
-        ("1/4", 1 / 4),
-        ("1/2", 1 / 2),
-        ("3/4", 3 / 4),
-        ("2", 2)
-    ]
-
-    for label, scale in scale_fractions:
+    for label, scale in [("1/6", 1/6), ("1/4", 1/4), ("1/2", 1/2), ("3/4", 3/4), ("2", 2)]:
         tk.Button(scale_frame, text=f"x{label}", command=lambda s=scale: apply_scale(s)).pack(side=tk.LEFT, padx=2)
 
     tk.Button(scale_frame, text="Custom", command=prompt_custom_scale).pack(side=tk.LEFT, padx=10)
@@ -147,7 +153,11 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
     tk.Button(scale_frame, text="Randomize", command=randomize_values).pack(side=tk.LEFT, padx=10)
     tk.Button(scale_frame, text="Shuffle", command=shuffle_values).pack(side=tk.LEFT, padx=10)
 
-    tk.Button(editor, text="Save and Close", command=write_values).grid(row=last_row + 2, column=0, columnspan=10, pady=10)
+    button_frame = tk.Frame(editor)
+    button_frame.grid(row=last_row + 2, column=0, columnspan=10, pady=10)
+    tk.Button(button_frame, text="Import Config", command=import_config).pack(side="left", padx=5)
+    tk.Button(button_frame, text="Export Config", command=export_config).pack(side="left", padx=5)
+    tk.Button(button_frame, text="Save and Close", command=write_values).pack(side="left", padx=5)
+
     editor.grab_set()
     editor.wait_window(editor)
-

@@ -1,7 +1,8 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 import fractions
 import random
+import json
 
 weapon_offsets = {
     'Zero 1': {
@@ -38,7 +39,6 @@ def open_weapon_exp_editor(rom_path, game_name):
                     ]
                 else:
                     values = [data[0]]
-
                 original_values[weapon] = values[:]
                 entries[weapon] = [tk.StringVar(value=str(val)) for val in values]
 
@@ -71,9 +71,7 @@ def open_weapon_exp_editor(rom_path, game_name):
                             if not (1 <= val <= 65535):
                                 raise ValueError(f"Value {val} for {weapon} must be between 1 and 65535.")
                             f.write(val.to_bytes(2, 'little'))
-
             editor.destroy()
-
         except ValueError as e:
             messagebox.showerror("Invalid Input", str(e))
         except Exception as e:
@@ -100,7 +98,6 @@ def open_weapon_exp_editor(rom_path, game_name):
             offset, length = weapon_offsets[game_name][weapon]
             max_val = 255 if length == 1 else 2000
             num_levels = len(vars_list)
-
             base = random.randint(1, max(1, max_val // (num_levels + 1)))
             values = [base]
             for _ in range(1, num_levels):
@@ -113,7 +110,6 @@ def open_weapon_exp_editor(rom_path, game_name):
         popup = tk.Toplevel(editor)
         popup.title("Custom EXP Scale Factor")
         popup.grab_set()
-
         tk.Label(popup, text="Enter custom EXP scale factor (> 0):\n(e.g., 0.5, 3/2, 150%)").pack(padx=10, pady=5)
         entry = tk.Entry(popup)
         entry.pack(padx=10, pady=5)
@@ -125,21 +121,48 @@ def open_weapon_exp_editor(rom_path, game_name):
                     value = float(input_str.rstrip('%')) / 100
                 else:
                     value = float(fractions.Fraction(input_str))
-
                 if value <= 0:
                     raise ValueError
                 apply_scale(value)
                 popup.destroy()
             except (ValueError, ZeroDivisionError):
-                messagebox.showerror(
-                    "Invalid Input",
-                    "Please enter a valid positive number, fraction (e.g., 2/3), or percent (e.g., 150%)."
-                )
+                messagebox.showerror("Invalid Input", "Please enter a valid positive number, fraction (e.g., 2/3), or percent (e.g., 150%).")
 
         tk.Button(popup, text="Apply", command=apply).pack(pady=10)
 
-    read_values()
+    def export_config():
+        data = {
+            "game": game_name,
+            "values": {
+                weapon: [var.get() for var in vars_list]
+                for weapon, vars_list in entries.items()
+            }
+        }
+        path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
+        if path:
+            with open(path, 'w') as f:
+                json.dump(data, f, indent=2)
+            messagebox.showinfo("Export Complete", "Weapon EXP values exported successfully.")
 
+    def import_config():
+        path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
+        if not path:
+            return
+        try:
+            with open(path, 'r') as f:
+                data = json.load(f)
+            if data.get("game") != game_name:
+                messagebox.showerror("Invalid Config", f"This config is for {data.get('game')}, not {game_name}.")
+                return
+            for weapon, values in data.get("values", {}).items():
+                if weapon in entries:
+                    for i, val in enumerate(values):
+                        entries[weapon][i].set(val)
+            messagebox.showinfo("Import Complete", "Weapon EXP values imported successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not import config:\n{e}")
+
+    read_values()
     row = 0
     for weapon, vars_list in entries.items():
         tk.Label(editor, text=weapon).grid(row=row, column=0, sticky="w", pady=4)
@@ -149,7 +172,6 @@ def open_weapon_exp_editor(rom_path, game_name):
 
     scale_frame = tk.Frame(editor)
     scale_frame.grid(row=row, column=0, columnspan=5, pady=5)
-
     tk.Label(scale_frame, text="Scale EXP: ").pack(side=tk.LEFT)
 
     scale_fractions = [
@@ -159,7 +181,6 @@ def open_weapon_exp_editor(rom_path, game_name):
         ("3/4", 3 / 4),
         ("2", 2)
     ]
-
     for label, scale in scale_fractions:
         tk.Button(scale_frame, text=f"x{label}", command=lambda s=scale: apply_scale(s)).pack(side=tk.LEFT, padx=2)
 
@@ -168,7 +189,11 @@ def open_weapon_exp_editor(rom_path, game_name):
     tk.Button(scale_frame, text="Randomize", command=randomize_values).pack(side=tk.LEFT, padx=10)
 
     row += 1
-    tk.Button(editor, text="Save and Close", command=write_values).grid(row=row, column=0, columnspan=5, pady=10)
+    btn_frame = tk.Frame(editor)
+    btn_frame.grid(row=row, column=0, columnspan=5, pady=10)
+    tk.Button(btn_frame, text="Import Config", command=import_config).pack(side="left", padx=5)
+    tk.Button(btn_frame, text="Export Config", command=export_config).pack(side="left", padx=5)
+    tk.Button(btn_frame, text="Save and Close", command=write_values).pack(side="left", padx=5)
 
     editor.grab_set()
     editor.wait_window(editor)
