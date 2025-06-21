@@ -23,6 +23,10 @@
 * Modify Weapon EXP (Zero 1 and 2)
 * Remove Cyber-Elf Penalty on Rank (Zero 1 and 2)
 
+### Why aren't weapons leveling up during the intro stage?
+* This is due to Zero 1 and 2 being coded to not have weapons gain experience during their intro stages
+* Any modified weapon EXP requirements will take effect after the intro stage though
+
 ### Why no Europe or Japanese ROM support?
 * This is a question I might get if someone uses this. The answer is that this is for multiple reasons
   * While Europe and USA Zero 2 is mostly identical and would work with this patcher, Zero 3 and 4 are not and would break the ROM if it's not USA. The patches and hex offsets this patcher uses are based on the USA ROM and are vastly different since the Zero 3 and 4 ROMs are very different internally
