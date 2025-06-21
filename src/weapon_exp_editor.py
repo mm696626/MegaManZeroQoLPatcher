@@ -6,19 +6,19 @@ import json
 
 weapon_offsets = {
     'Zero 1': {
-        'Buster Shot': (0x2A8168, 4),
-        'Z-Saber': (0x2A8184, 8),
-        'Triple Rod': (0x2A81BE, 8),
-        'Shield Boomerang': (0x2A81D6, 4),
+        'Buster Shot': (0x2A8168, 4, ["Charged Buster", "Faster Charge"]),
+        'Z-Saber': (0x2A8184, 8, ["Second Slash", "Third Slash", "Charged Saber", "Faster Charge"]),
+        'Triple Rod': (0x2A81BE, 8, ["Second Stab", "Third Stab", "Charged Rod", "Faster Charge"]),
+        'Shield Boomerang': (0x2A81D6, 4, ["Farther Attack Range", "Farthest Attack Range"]),
         'Buster 4 Shot Upgrade': (0x188A2, 1),
         'Air Spin Slash': (0x18A60, 1),
         'Dash Spin Slash': (0x18A1C, 1),
     },
     'Zero 2': {
-        'Buster Shot': (0x3359B4, 4),
-        'Z-Saber': (0x3359C4, 8),
-        'Chain Rod': (0x3359DA, 4),
-        'Shield Boomerang': (0x3359E8, 4),
+        'Buster Shot': (0x3359B4, 4, ["Charged Buster", "Faster Charge"]),
+        'Z-Saber': (0x3359C4, 8, ["Second Slash", "Third Slash", "Charged Saber", "Faster Charge"]),
+        'Chain Rod': (0x3359DA, 4, ["Charged Rod", "Faster Charge"]),
+        'Shield Boomerang': (0x3359E8, 4, ["Farther Attack Range", "Farthest Attack Range"]),
     }
 }
 
@@ -30,22 +30,24 @@ def open_weapon_exp_editor(rom_path, game_name):
 
     def read_values():
         with open(rom_path, 'rb') as f:
-            for weapon, (offset, length) in weapon_offsets[game_name].items():
+            for weapon, data in weapon_offsets[game_name].items():
+                offset, length = data[0], data[1]
                 f.seek(offset)
-                data = f.read(length)
+                raw_data = f.read(length)
                 if length > 1:
                     values = [
-                        int.from_bytes(data[i:i+2], 'little') for i in range(0, length, 2)
+                        int.from_bytes(raw_data[i:i + 2], 'little') for i in range(0, length, 2)
                     ]
                 else:
-                    values = [data[0]]
+                    values = [raw_data[0]]
                 original_values[weapon] = values[:]
                 entries[weapon] = [tk.StringVar(value=str(val)) for val in values]
 
     def write_values():
         try:
             with open(rom_path, 'r+b') as f:
-                for weapon, (offset, length) in weapon_offsets[game_name].items():
+                for weapon, data in weapon_offsets[game_name].items():
+                    offset, length = data[0], data[1]
                     f.seek(offset)
                     values = []
                     for var in entries[weapon]:
@@ -79,7 +81,8 @@ def open_weapon_exp_editor(rom_path, game_name):
 
     def apply_scale(factor):
         for weapon, vars_list in entries.items():
-            max_val = 255 if len(vars_list) == 1 and weapon_offsets[game_name][weapon][1] == 1 else 65535
+            offset, length = weapon_offsets[game_name][weapon][0], weapon_offsets[game_name][weapon][1]
+            max_val = 255 if len(vars_list) == 1 and length == 1 else 65535
             for i, var in enumerate(vars_list):
                 try:
                     val = int(var.get())
@@ -95,7 +98,7 @@ def open_weapon_exp_editor(rom_path, game_name):
 
     def randomize_values():
         for weapon, vars_list in entries.items():
-            offset, length = weapon_offsets[game_name][weapon]
+            offset, length = weapon_offsets[game_name][weapon][0], weapon_offsets[game_name][weapon][1]
             max_val = 255 if length == 1 else 2000
             num_levels = len(vars_list)
             base = random.randint(1, max(1, max_val // (num_levels + 1)))
@@ -165,9 +168,19 @@ def open_weapon_exp_editor(rom_path, game_name):
     read_values()
     row = 0
     for weapon, vars_list in entries.items():
+        data = weapon_offsets[game_name][weapon]
+        labels = data[2] if len(data) == 3 else None
+
         tk.Label(editor, text=weapon).grid(row=row, column=0, sticky="w", pady=4)
+
+        if labels:
+            for i, label in enumerate(labels):
+                tk.Label(editor, text=label).grid(row=row, column=i + 1)
+            row += 1
+
         for i, var in enumerate(vars_list):
-            tk.Entry(editor, textvariable=var, width=6).grid(row=row, column=i+1, padx=2)
+            tk.Entry(editor, textvariable=var, width=6).grid(row=row, column=i + 1, padx=2)
+
         row += 1
 
     scale_frame = tk.Frame(editor)
