@@ -145,17 +145,22 @@ def show_patch_options(game_name, file_path, save_path):
         }
         save_path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON Files", "*.json")])
         if save_path:
-            with open(save_path, 'w') as f:
-                json.dump(config, f)
-            messagebox.showinfo("Export Complete", "Patch configuration exported successfully.")
+            try:
+                with open(save_path, 'w') as f:
+                    json.dump(config, f, indent=2)
+                messagebox.showinfo("Export Complete", "Patch configuration exported successfully.")
+            except Exception as e:
+                messagebox.showerror("Error", f"Could not export patch config:\n{e}")
 
     def import_patch_config():
         load_path = filedialog.askopenfilename(filetypes=[("JSON Files", "*.json")])
-        if load_path:
+        if not load_path:
+            return
+        try:
             with open(load_path, 'r') as f:
                 config = json.load(f)
             if config.get('game') != game_name:
-                messagebox.showerror("Error", f"Config is for {config.get('game')}, not {game_name}.")
+                messagebox.showerror("Error", f"This config is for {config.get('game')}, not {game_name}.")
                 return
             options = config.get('options', {})
             blood_restore.set(options.get('blood_restore', False))
@@ -167,6 +172,8 @@ def show_patch_options(game_name, file_path, save_path):
             modify_weapon_exp.set(options.get('modify_weapon_exp', False))
             modify_cyber_elf_costs.set(options.get('modify_cyber_elf_costs', False))
             messagebox.showinfo("Import Complete", "Patch configuration imported successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not import patch config:\n{e}")
 
     def on_window_close():
         patch_window.destroy()
