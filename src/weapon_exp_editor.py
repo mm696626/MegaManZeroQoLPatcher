@@ -145,7 +145,6 @@ def open_weapon_exp_editor(rom_path, game_name):
         if path:
             with open(path, 'w') as f:
                 json.dump(data, f, indent=2)
-            messagebox.showinfo("Export Complete", "Weapon EXP values exported successfully.")
 
     def import_config():
         path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
@@ -161,7 +160,6 @@ def open_weapon_exp_editor(rom_path, game_name):
                 if weapon in entries:
                     for i, val in enumerate(values):
                         entries[weapon][i].set(val)
-            messagebox.showinfo("Import Complete", "Weapon EXP values imported successfully.")
         except Exception as e:
             messagebox.showerror("Error", f"Could not import config:\n{e}")
 

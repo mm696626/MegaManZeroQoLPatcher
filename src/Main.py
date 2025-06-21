@@ -148,7 +148,6 @@ def show_patch_options(game_name, file_path, save_path):
             try:
                 with open(save_path, 'w') as f:
                     json.dump(config, f, indent=2)
-                messagebox.showinfo("Export Complete", "Patch configuration exported successfully.")
             except Exception as e:
                 messagebox.showerror("Error", f"Could not export patch config:\n{e}")
 
@@ -171,7 +170,6 @@ def show_patch_options(game_name, file_path, save_path):
             no_elf_penalty.set(options.get('no_elf_penalty', False))
             modify_weapon_exp.set(options.get('modify_weapon_exp', False))
             modify_cyber_elf_costs.set(options.get('modify_cyber_elf_costs', False))
-            messagebox.showinfo("Import Complete", "Patch configuration imported successfully.")
         except Exception as e:
             messagebox.showerror("Error", f"Could not import patch config:\n{e}")
 

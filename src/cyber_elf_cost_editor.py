@@ -108,7 +108,6 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
             try:
                 with open(path, 'w') as f:
                     json.dump(data, f, indent=2)
-                messagebox.showinfo("Export Complete", "Cyber-Elf/Croire costs exported successfully.")
             except Exception as e:
                 messagebox.showerror("Error", f"Could not export config:\n{e}")
 
@@ -128,7 +127,6 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
                 return
             for (_, var), val in zip(entries, values):
                 var.set(str(val))
-            messagebox.showinfo("Import Complete", "Cyber-Elf/Croire costs imported successfully.")
         except Exception as e:
             messagebox.showerror("Error", f"Could not import config:\n{e}")
 
