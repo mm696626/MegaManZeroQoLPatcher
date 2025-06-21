@@ -6,6 +6,7 @@ from PIL import Image, ImageTk
 import hashlib
 import os
 import shutil
+import json
 
 import cyber_elf_cost_editor
 import ips_patch_applier
@@ -128,6 +129,45 @@ def show_patch_options(game_name, file_path, save_path):
 
         messagebox.showinfo("Done", f"Patching for {game_name} is complete!")
 
+    def export_patch_config():
+        config = {
+            'game': game_name,
+            'options': {
+                'blood_restore': blood_restore.get(),
+                'vocal_restore': vocal_restore.get(),
+                'ex_skill': ex_skill.get(),
+                'bn_viruses': bn_viruses.get(),
+                'retry_chips': retry_chips.get(),
+                'no_elf_penalty': no_elf_penalty.get(),
+                'modify_weapon_exp': modify_weapon_exp.get(),
+                'modify_cyber_elf_costs': modify_cyber_elf_costs.get()
+            }
+        }
+        save_path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON Files", "*.json")])
+        if save_path:
+            with open(save_path, 'w') as f:
+                json.dump(config, f)
+            messagebox.showinfo("Export Complete", "Patch configuration exported successfully.")
+
+    def import_patch_config():
+        load_path = filedialog.askopenfilename(filetypes=[("JSON Files", "*.json")])
+        if load_path:
+            with open(load_path, 'r') as f:
+                config = json.load(f)
+            if config.get('game') != game_name:
+                messagebox.showerror("Error", f"Config is for {config.get('game')}, not {game_name}.")
+                return
+            options = config.get('options', {})
+            blood_restore.set(options.get('blood_restore', False))
+            vocal_restore.set(options.get('vocal_restore', False))
+            ex_skill.set(options.get('ex_skill', False))
+            bn_viruses.set(options.get('bn_viruses', False))
+            retry_chips.set(options.get('retry_chips', False))
+            no_elf_penalty.set(options.get('no_elf_penalty', False))
+            modify_weapon_exp.set(options.get('modify_weapon_exp', False))
+            modify_cyber_elf_costs.set(options.get('modify_cyber_elf_costs', False))
+            messagebox.showinfo("Import Complete", "Patch configuration imported successfully.")
+
     def on_window_close():
         patch_window.destroy()
 
@@ -161,7 +201,12 @@ def show_patch_options(game_name, file_path, save_path):
         tk.Checkbutton(patch_window, text="Modify Weapon EXP", variable=modify_weapon_exp).pack(anchor="w")
         tk.Checkbutton(patch_window, text="Remove Cyber-Elf Penalty on Rank", variable=no_elf_penalty).pack(anchor="w")
 
-    tk.Button(patch_window, text="Apply Patches", command=apply_patches).pack(pady=10)
+    btn_frame = tk.Frame(patch_window)
+    btn_frame.pack(pady=10)
+
+    tk.Button(btn_frame, text="Import Config", command=import_patch_config).pack(side="left", padx=5)
+    tk.Button(btn_frame, text="Export Config", command=export_patch_config).pack(side="left", padx=5)
+    tk.Button(btn_frame, text="Apply Patches", command=apply_patches).pack(side="left", padx=5)
     patch_window.wait_window(patch_window)
 
 root = tk.Tk()
