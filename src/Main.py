@@ -1,7 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
-from tkinter import PhotoImage
+from tkinter import filedialog, messagebox, PhotoImage, ttk
 from PIL import Image, ImageTk
 import hashlib
 import os
@@ -25,6 +23,27 @@ EXPECTED_SIZE = {
     'Zero 3': 8388608,
     'Zero 4': 16777216
 }
+
+SETTINGS_FILE = "settings.json"
+
+
+def load_settings():
+    if os.path.exists(SETTINGS_FILE):
+        try:
+            with open(SETTINGS_FILE, "r") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Failed to load settings: {e}")
+    return {"region": "US"}
+
+
+def save_settings():
+    settings = {"region": region.get()}
+    try:
+        with open(SETTINGS_FILE, "w") as f:
+            json.dump(settings, f, indent=2)
+    except Exception as e:
+        print(f"Failed to save settings: {e}")
 
 
 def calculate_md5(file_path):
@@ -219,34 +238,61 @@ root.title("Mega Man Zero Series Quality of Life Patcher")
 icon = PhotoImage(file='images/zero-icon.png')
 root.iconphoto(True, icon)
 
-frame1 = tk.Frame(root)
-frame1.pack(padx=10, pady=10)
+region = tk.StringVar()
+region.set(load_settings().get("region", "US"))
 
-def load_image(image_path, size=(200, 200)):
+notebook = ttk.Notebook(root)
+notebook.pack(fill='both', expand=True)
+
+patcher_tab = tk.Frame(notebook)
+settings_tab = tk.Frame(notebook)
+notebook.add(patcher_tab, text='Patcher')
+notebook.add(settings_tab, text='Settings')
+
+
+def load_image(image_base):
+    suffix = "_jpn" if region.get() == "JPN" else ""
+    image_path = f"images/{image_base}{suffix}.png"
     try:
         img = Image.open(image_path)
-        img = img.resize(size)
-        img_tk = ImageTk.PhotoImage(img)
-        return img_tk
+        return ImageTk.PhotoImage(img)
     except Exception as e:
         print(f"Error loading image {image_path}: {e}")
         return None
 
-zero1_img = load_image("images/zero1.png")
-zero2_img = load_image("images/zero2.png")
-zero3_img = load_image("images/zero3.png")
-zero4_img = load_image("images/zero4.png")
 
-button1 = tk.Button(frame1, image=zero1_img, command=lambda: open_file('Zero 1'))
-button1.grid(row=0, column=0, padx=10, pady=10)
 
-button2 = tk.Button(frame1, image=zero2_img, command=lambda: open_file('Zero 2'))
-button2.grid(row=0, column=1, padx=10, pady=10)
+def load_game_buttons():
+    for widget in patcher_tab.winfo_children():
+        widget.destroy()
 
-button3 = tk.Button(frame1, image=zero3_img, command=lambda: open_file('Zero 3'))
-button3.grid(row=1, column=0, padx=10, pady=10)
+    zero1_img = load_image("zero1")
+    zero2_img = load_image("zero2")
+    zero3_img = load_image("zero3")
+    zero4_img = load_image("zero4")
 
-button4 = tk.Button(frame1, image=zero4_img, command=lambda: open_file('Zero 4'))
-button4.grid(row=1, column=1, padx=10, pady=10)
+    tk.Button(patcher_tab, image=zero1_img, command=lambda: open_file('Zero 1')).grid(row=0, column=0, padx=10, pady=10)
+    tk.Button(patcher_tab, image=zero2_img, command=lambda: open_file('Zero 2')).grid(row=0, column=1, padx=10, pady=10)
+    tk.Button(patcher_tab, image=zero3_img, command=lambda: open_file('Zero 3')).grid(row=1, column=0, padx=10, pady=10)
+    tk.Button(patcher_tab, image=zero4_img, command=lambda: open_file('Zero 4')).grid(row=1, column=1, padx=10, pady=10)
 
+    patcher_tab.zero1_img = zero1_img
+    patcher_tab.zero2_img = zero2_img
+    patcher_tab.zero3_img = zero3_img
+    patcher_tab.zero4_img = zero4_img
+
+
+tk.Label(settings_tab, text="Box Art Region:").pack(pady=10)
+region_dropdown = ttk.Combobox(settings_tab, textvariable=region, values=["US", "JPN"], state="readonly")
+region_dropdown.pack()
+
+
+def on_region_change(event=None):
+    save_settings()
+    load_game_buttons()
+
+
+region_dropdown.bind("<<ComboboxSelected>>", on_region_change)
+
+load_game_buttons()
 root.mainloop()
