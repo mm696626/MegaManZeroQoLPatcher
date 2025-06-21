@@ -97,26 +97,26 @@ def show_patch_options(game_name, file_path, save_path):
                 patch_list.append("patches/mmz1_blood.ips")
 
         elif game_name == 'Zero 2':
-            if blood_restore.get():
-                patch_list.append("patches/mmz2_blood.ips")
             if ex_skill.get():
                 patch_list.append("patches/mmz2_easyexskill.ips")
             if no_elf_penalty.get():
                 patch_list.append("patches/mmz2_mission_penalty.ips")
+            if blood_restore.get():
+                patch_list.append("patches/mmz2_blood.ips")
 
         elif game_name == 'Zero 3':
-            if blood_restore.get():
-                patch_list.append("patches/mmz3_blood.ips")
             if ex_skill.get():
                 patch_list.append("patches/mmz3_easyexskill.ips")
             if bn_viruses.get():
                 patch_list.append("patches/mmz3_exevirus.ips")
+            if blood_restore.get():
+                patch_list.append("patches/mmz3_blood.ips")
 
         elif game_name == 'Zero 4':
-            if blood_restore.get():
-                patch_list.append("patches/mmz4_blood.ips")
             if vocal_restore.get():
                 patch_list.append("patches/mmz4_vocals.ips")
+            if blood_restore.get():
+                patch_list.append("patches/mmz4_blood.ips")
 
         ips_patch_applier.apply_ips_patches(file_path, save_path, patch_list)
         patch_window.destroy()
