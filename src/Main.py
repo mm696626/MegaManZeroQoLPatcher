@@ -385,7 +385,8 @@ default_rom_folder = tk.StringVar()
 default_rom_folder.set(load_settings().get("default_rom_folder", ""))
 
 tk.Label(settings_tab, text="Default ROM Folder:").pack(pady=10)
-tk.Entry(settings_tab, textvariable=default_rom_folder, width=40).pack()
+rom_folder_entry = ttk.Entry(settings_tab, textvariable=default_rom_folder, width=40, state="readonly")
+rom_folder_entry.pack()
 tk.Button(settings_tab, text="Browse", command=choose_default_rom_folder).pack(pady=5)
 
 status_labels = {}
