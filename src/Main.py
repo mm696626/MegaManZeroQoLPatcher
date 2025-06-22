@@ -33,6 +33,27 @@ ROM_HEADER_SIGNATURES = {
 
 SETTINGS_FILE = "settings.json"
 
+valid_rom_paths = {}
+
+def validate_roms_in_folder():
+    folder = default_rom_folder.get()
+    global valid_rom_paths
+    if not os.path.isdir(folder):
+        valid_rom_paths.clear()
+        update_status_labels()
+        return
+
+    valid_rom_paths.clear()
+
+    for game_name in EXPECTED_MD5:
+        for file in os.listdir(folder):
+            if file.lower().endswith(".gba"):
+                full_path = os.path.join(folder, file)
+                if silently_check_rom_validity(full_path, game_name):
+                    valid_rom_paths[game_name] = full_path
+                    break
+
+    update_status_labels()
 
 def load_settings():
     if os.path.exists(SETTINGS_FILE):
@@ -41,11 +62,14 @@ def load_settings():
                 return json.load(f)
         except Exception as e:
             print(f"Failed to load settings: {e}")
-    return {"region": "US"}
+    return {"region": "US", "default_rom_folder": ""}
 
 
 def save_settings():
-    settings = {"region": region.get()}
+    settings = {
+        "region": region.get(),
+        "default_rom_folder": default_rom_folder.get()
+    }
     try:
         with open(SETTINGS_FILE, "w") as f:
             json.dump(settings, f, indent=2)
@@ -68,6 +92,27 @@ def read_gba_rom_header(file_path):
     except Exception as e:
         print(f"Failed to read ROM header: {e}")
         return None
+
+def silently_check_rom_validity(file_path, game_name):
+    try:
+        file_size = os.path.getsize(file_path)
+        expected_size = EXPECTED_SIZE.get(game_name)
+        if file_size != expected_size:
+            return False
+
+        rom_header = read_gba_rom_header(file_path)
+        expected_rom_header = ROM_HEADER_SIGNATURES.get(game_name)
+        if rom_header != expected_rom_header:
+            return False
+
+        md5_hash = calculate_md5(file_path)
+        expected_md5 = EXPECTED_MD5.get(game_name)
+        if md5_hash != expected_md5:
+            return False
+
+        return True
+    except Exception:
+        return False
 
 def check_rom_validity(file_path, game_name):
     file_size = os.path.getsize(file_path)
@@ -98,31 +143,28 @@ def copy_file(file_path, save_path):
     shutil.copy2(file_path, save_path)
 
 def open_file(game_name):
-
     filetypes = [("GBA Files", "*.gba")]
 
-    file_path = filedialog.askopenfilename(
-        title=f"Open {game_name} ROM File",
+    file_path = valid_rom_paths.get(game_name)
+    if not file_path:
+        file_path = filedialog.askopenfilename(
+            title=f"Open {game_name} ROM File",
+            filetypes=filetypes
+        )
+        if not file_path or not check_rom_validity(file_path, game_name):
+            return
+
+    save_path = filedialog.asksaveasfilename(
+        title=f"Save Modified {game_name} ROM File",
+        defaultextension=".gba",
         filetypes=filetypes
     )
 
-    if file_path:
-        if not check_rom_validity(file_path, game_name):
-            return
+    if not save_path:
+        return
 
-        save_path = filedialog.asksaveasfilename(
-            title=f"Save Modified {game_name} ROM File",
-            defaultextension=".gba",
-            filetypes=filetypes
-        )
-
-        if not save_path:
-            return
-
-        copy_file(file_path, save_path)
-        show_patch_options(game_name, file_path, save_path)
-    else:
-        pass
+    copy_file(file_path, save_path)
+    show_patch_options(game_name, file_path, save_path)
 
 
 def show_patch_options(game_name, file_path, save_path):
@@ -303,6 +345,21 @@ def load_game_buttons():
     patcher_tab.zero3_img = zero3_img
     patcher_tab.zero4_img = zero4_img
 
+def choose_default_rom_folder():
+    folder = filedialog.askdirectory()
+    if folder:
+        default_rom_folder.set(folder)
+        save_settings()
+        validate_roms_in_folder()
+
+def update_status_labels():
+    for game_name, status_label in status_labels.items():
+        path = valid_rom_paths.get(game_name)
+        if path and os.path.exists(path):
+            status_label.config(text="Valid", fg="green")
+        else:
+            status_label.config(text="Missing/Invalid", fg="red")
+
 
 tk.Label(settings_tab, text="Box Art Region:").pack(pady=10)
 region_dropdown = ttk.Combobox(settings_tab, textvariable=region, values=["US", "JPN"], state="readonly")
@@ -316,5 +373,32 @@ def on_region_change(event=None):
 
 region_dropdown.bind("<<ComboboxSelected>>", on_region_change)
 
+default_rom_folder = tk.StringVar()
+default_rom_folder.set(load_settings().get("default_rom_folder", ""))
+
+tk.Label(settings_tab, text="Default ROM Folder:").pack(pady=10)
+tk.Entry(settings_tab, textvariable=default_rom_folder, width=40).pack()
+tk.Button(settings_tab, text="Browse", command=choose_default_rom_folder).pack(pady=5)
+
+status_labels = {}
+
+status_frame = tk.Frame(settings_tab)
+status_frame.pack(pady=10, fill="x")
+
+tk.Label(status_frame, text="ROM Validation Status:", font=("Arial", 10, "bold")).pack(anchor="w")
+
+for game in EXPECTED_MD5:
+    frame = tk.Frame(status_frame)
+    frame.pack(anchor="w", pady=2, fill="x")
+
+    tk.Label(frame, text=game + ":").pack(side="left", padx=5)
+    label = tk.Label(frame, text="Unknown", fg="orange")
+    label.pack(side="left")
+    status_labels[game] = label
+
+refresh_btn = tk.Button(status_frame, text="Refresh ROM Status", command=validate_roms_in_folder)
+refresh_btn.pack(pady=5, anchor="w")
+
 load_game_buttons()
+validate_roms_in_folder()
 root.mainloop()
