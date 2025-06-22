@@ -143,16 +143,42 @@ def copy_file(file_path, save_path):
     shutil.copy2(file_path, save_path)
 
 def open_file(game_name):
-    filetypes = [("GBA Files", "*.gba")]
+    default_folder = default_rom_folder.get()
+    valid_path = valid_rom_paths.get(game_name)
 
-    file_path = valid_rom_paths.get(game_name)
-    if not file_path:
-        file_path = filedialog.askopenfilename(
-            title=f"Open {game_name} ROM File",
-            filetypes=filetypes
+    if valid_path and os.path.isfile(valid_path):
+        save_path = filedialog.asksaveasfilename(
+            title=f"Save Modified {game_name} ROM File",
+            defaultextension=".gba",
+            filetypes=[("GBA Files", "*.gba")]
         )
-        if not file_path or not check_rom_validity(file_path, game_name):
+        if not save_path:
             return
+        copy_file(valid_path, save_path)
+        show_patch_options(game_name, valid_path, save_path)
+        return
+
+    filetypes = [("GBA Files", "*.gba")]
+    file_path = filedialog.askopenfilename(
+        title=f"Open {game_name} ROM File",
+        filetypes=filetypes
+    )
+
+    if not file_path:
+        return
+
+    if not check_rom_validity(file_path, game_name):
+        return
+
+    if default_folder and os.path.isdir(default_folder):
+        standard_name = f"{game_name.replace(' ', '')}.gba"
+        save_path_in_default = os.path.join(default_folder, standard_name)
+        try:
+            shutil.copy2(file_path, save_path_in_default)
+            valid_rom_paths[game_name] = save_path_in_default
+            update_status_labels()
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to copy ROM to default folder:\n{e}")
 
     save_path = filedialog.asksaveasfilename(
         title=f"Save Modified {game_name} ROM File",
@@ -385,7 +411,7 @@ status_labels = {}
 status_frame = tk.Frame(settings_tab)
 status_frame.pack(pady=10, fill="x")
 
-tk.Label(status_frame, text="ROM Validation Status:", font=("Arial", 10, "bold")).pack(anchor="w")
+tk.Label(status_frame, text="ROM Validation Status:").pack(anchor="w")
 
 for game in EXPECTED_MD5:
     frame = tk.Frame(status_frame)
