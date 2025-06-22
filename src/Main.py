@@ -451,7 +451,7 @@ refresh_btn = tk.Button(status_frame, text="Refresh ROM Status", command=validat
 refresh_btn.pack(pady=5, anchor="w")
 
 
-def reset_all_defaults():
+def delete_default_configs():
     if not os.path.exists(DEFAULT_CONFIG_DIR):
         return
 
@@ -465,7 +465,7 @@ def reset_all_defaults():
         except Exception as e:
             messagebox.showerror("Error", f"Failed to delete default config files:\n{e}")
 
-tk.Button(settings_tab, text="Reset All Defaults", command=reset_all_defaults).pack(side="left", padx=5, pady=5)
+tk.Button(settings_tab, text="Delete Default Configs", command=delete_default_configs).pack(side="left", padx=5, pady=5)
 
 load_game_buttons()
 validate_roms_in_folder()
