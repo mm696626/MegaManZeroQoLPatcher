@@ -179,7 +179,6 @@ def open_weapon_exp_editor(rom_path, game_name):
         try:
             with open(path, 'w') as f:
                 json.dump(data, f, indent=2)
-            messagebox.showinfo("Saved", f"Default config saved for {game_name}.")
         except Exception as e:
             messagebox.showerror("Error", f"Could not save default config:\n{e}")
 

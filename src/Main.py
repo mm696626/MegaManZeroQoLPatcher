@@ -289,7 +289,6 @@ def show_patch_options(game_name, file_path, save_path):
         try:
             with open(default_path, 'w') as f:
                 json.dump(config, f, indent=2)
-            messagebox.showinfo("Saved", f"Default config saved for {game_name}.")
         except Exception as e:
             messagebox.showerror("Error", f"Could not save default config:\n{e}")
 
@@ -454,7 +453,6 @@ refresh_btn.pack(pady=5, anchor="w")
 
 def reset_all_defaults():
     if not os.path.exists(DEFAULT_CONFIG_DIR):
-        messagebox.showinfo("No Defaults", "There are no default configs to delete.")
         return
 
     confirm = messagebox.askyesno("Confirm Reset", "Are you sure you want to delete all saved default configs?")
@@ -464,7 +462,6 @@ def reset_all_defaults():
                 file_path = os.path.join(DEFAULT_CONFIG_DIR, filename)
                 if os.path.isfile(file_path):
                     os.remove(file_path)
-            messagebox.showinfo("Defaults Reset", "All default config files have been deleted.")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to delete default config files:\n{e}")
 
