@@ -62,12 +62,12 @@ def load_settings():
                 return json.load(f)
         except Exception as e:
             print(f"Failed to load settings: {e}")
-    return {"region": "US", "default_rom_folder": ""}
+    return {"box_art_region": "US", "default_rom_folder": ""}
 
 
 def save_settings():
     settings = {
-        "region": region.get(),
+        "box_art_region": box_art_region.get(),
         "default_rom_folder": default_rom_folder.get()
     }
     try:
@@ -310,8 +310,8 @@ root.title("Mega Man Zero Series Quality of Life Patcher")
 icon = PhotoImage(file='images/zero-icon.png')
 root.iconphoto(True, icon)
 
-region = tk.StringVar()
-region.set(load_settings().get("region", "US"))
+box_art_region = tk.StringVar()
+box_art_region.set(load_settings().get("box_art_region", "US"))
 
 notebook = ttk.Notebook(root)
 notebook.pack(fill='both', expand=True)
@@ -323,7 +323,7 @@ notebook.add(settings_tab, text='Settings')
 
 
 def load_image(image_base):
-    suffix = "_jpn" if region.get() == "JPN" else ""
+    suffix = "_jpn" if box_art_region.get() == "Japan" else ""
     image_path = f"images/{image_base}{suffix}.png"
     try:
         img = Image.open(image_path)
@@ -370,7 +370,7 @@ def update_status_labels():
 
 
 tk.Label(settings_tab, text="Box Art Region:").pack(pady=10)
-region_dropdown = ttk.Combobox(settings_tab, textvariable=region, values=["US", "JPN"], state="readonly")
+region_dropdown = ttk.Combobox(settings_tab, textvariable=box_art_region, values=["USA", "Japan"], state="readonly")
 region_dropdown.pack()
 
 
