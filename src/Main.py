@@ -24,6 +24,13 @@ EXPECTED_SIZE = {
     'Zero 4': 16777216
 }
 
+ROM_HEADER_SIGNATURES = {
+    'Zero 1': b'MEGAMAN ZEROAZCE08',
+    'Zero 2': b'MEGAMANZERO2A62E08',
+    'Zero 3': b'MEGAMANZERO3BZ3E08',
+    'Zero 4': b'MEGAMANZERO4B4ZE08'
+}
+
 SETTINGS_FILE = "settings.json"
 
 
@@ -53,6 +60,14 @@ def calculate_md5(file_path):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
 
+def read_gba_rom_header(file_path):
+    try:
+        with open(file_path, 'rb') as f:
+            f.seek(0xA0)
+            return f.read(0xB2 - 0xA0)
+    except Exception as e:
+        print(f"Failed to read ROM header: {e}")
+        return None
 
 def check_rom_validity(file_path, game_name):
     file_size = os.path.getsize(file_path)
@@ -60,6 +75,13 @@ def check_rom_validity(file_path, game_name):
 
     if file_size != expected_size:
         messagebox.showerror("Invalid ROM", f"Invalid file size for {game_name}. Expected size: {expected_size} bytes.")
+        return False
+
+    rom_header = read_gba_rom_header(file_path)
+    expected_rom_header = ROM_HEADER_SIGNATURES.get(game_name)
+
+    if rom_header != expected_rom_header:
+        messagebox.showerror("Invalid ROM", f"Invalid header for {game_name}. Expected header: {expected_rom_header}.")
         return False
 
     md5_hash = calculate_md5(file_path)
