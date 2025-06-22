@@ -11,10 +11,10 @@ import ips_patch_applier
 import weapon_exp_editor
 
 EXPECTED_MD5 = {
-    'Zero 1': ['b24a17d080a01a404cbf018ba42b9803'],
-    'Zero 2': ['182363b0698322e1864ced6e9eed7ead'],
-    'Zero 3': ['aa1d5eeffcd5e4577db9ee6d9b1100f9'],
-    'Zero 4': ['0d1e88bdb09ff68adf9877a121325f9c']
+    'Zero 1': 'b24a17d080a01a404cbf018ba42b9803',
+    'Zero 2': '182363b0698322e1864ced6e9eed7ead',
+    'Zero 3': 'aa1d5eeffcd5e4577db9ee6d9b1100f9',
+    'Zero 4': '0d1e88bdb09ff68adf9877a121325f9c'
 }
 
 EXPECTED_SIZE = {
@@ -63,10 +63,10 @@ def check_rom_validity(file_path, game_name):
         return False
 
     md5_hash = calculate_md5(file_path)
-    expected_md5_list = EXPECTED_MD5.get(game_name)
+    expected_md5 = EXPECTED_MD5.get(game_name)
 
-    if md5_hash not in expected_md5_list:
-        messagebox.showerror("Invalid ROM", f"Invalid MD5 for {game_name}. Expected one of: {expected_md5_list}.")
+    if md5_hash != expected_md5:
+        messagebox.showerror("Invalid ROM", f"Invalid MD5 for {game_name}. Expected MD5 hash of: {expected_md5}.")
         return False
 
     return True
