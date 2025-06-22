@@ -49,7 +49,7 @@ def validate_roms_in_folder():
         for file in os.listdir(folder):
             if file.lower().endswith(".gba"):
                 full_path = os.path.join(folder, file)
-                if silently_check_rom_validity(full_path, game_name):
+                if check_rom_validity(full_path, game_name, True):
                     valid_rom_paths[game_name] = full_path
                     break
 
@@ -93,47 +93,29 @@ def read_gba_rom_header(file_path):
         print(f"Failed to read ROM header: {e}")
         return None
 
-def silently_check_rom_validity(file_path, game_name):
-    try:
-        file_size = os.path.getsize(file_path)
-        expected_size = EXPECTED_SIZE.get(game_name)
-        if file_size != expected_size:
-            return False
-
-        rom_header = read_gba_rom_header(file_path)
-        expected_rom_header = ROM_HEADER_SIGNATURES.get(game_name)
-        if rom_header != expected_rom_header:
-            return False
-
-        md5_hash = calculate_md5(file_path)
-        expected_md5 = EXPECTED_MD5.get(game_name)
-        if md5_hash != expected_md5:
-            return False
-
-        return True
-    except Exception:
-        return False
-
-def check_rom_validity(file_path, game_name):
+def check_rom_validity(file_path, game_name, silent):
     file_size = os.path.getsize(file_path)
     expected_size = EXPECTED_SIZE.get(game_name)
 
     if file_size != expected_size:
-        messagebox.showerror("Invalid ROM", f"Invalid file size for {game_name}. Expected size: {expected_size} bytes.")
+        if not silent:
+            messagebox.showerror("Invalid ROM", f"Invalid file size for {game_name}. Expected size: {expected_size} bytes.")
         return False
 
     rom_header = read_gba_rom_header(file_path)
     expected_rom_header = ROM_HEADER_SIGNATURES.get(game_name)
 
     if rom_header != expected_rom_header:
-        messagebox.showerror("Invalid ROM", f"Invalid header for {game_name}. Expected header: {expected_rom_header}.")
+        if not silent:
+            messagebox.showerror("Invalid ROM", f"Invalid header for {game_name}. Expected header: {expected_rom_header}.")
         return False
 
     md5_hash = calculate_md5(file_path)
     expected_md5 = EXPECTED_MD5.get(game_name)
 
     if md5_hash != expected_md5:
-        messagebox.showerror("Invalid ROM", f"Invalid MD5 for {game_name}. Expected MD5 hash of: {expected_md5}.")
+        if not silent:
+            messagebox.showerror("Invalid ROM", f"Invalid MD5 for {game_name}. Expected MD5 hash of: {expected_md5}.")
         return False
 
     return True
@@ -167,7 +149,7 @@ def open_file(game_name):
     if not file_path:
         return
 
-    if not check_rom_validity(file_path, game_name):
+    if not check_rom_validity(file_path, game_name, False):
         return
 
     if default_folder and os.path.isdir(default_folder):
