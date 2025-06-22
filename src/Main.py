@@ -465,7 +465,41 @@ def delete_default_configs():
         except Exception as e:
             messagebox.showerror("Error", f"Failed to delete default config files:\n{e}")
 
+def reset_settings_to_default():
+    confirm = messagebox.askyesno("Confirm Reset", "Are you sure you want to reset settings to default values?")
+    if not confirm:
+        return
+
+    default_settings = {
+        "box_art_region": "US",
+        "default_rom_folder": ""
+    }
+    try:
+        with open(SETTINGS_FILE, "w") as f:
+            json.dump(default_settings, f, indent=2)
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to reset settings:\n{e}")
+        return
+
+    box_art_region.set(default_settings["box_art_region"])
+    default_rom_folder.set(default_settings["default_rom_folder"])
+
+    save_settings()
+
+    region_dropdown.set(default_settings["box_art_region"])
+    rom_folder_entry.config(state="normal")
+    rom_folder_entry.delete(0, tk.END)
+    rom_folder_entry.insert(0, default_settings["default_rom_folder"])
+    rom_folder_entry.config(state="readonly")
+
+    validate_roms_in_folder()
+    load_game_buttons()
+    messagebox.showinfo("Reset", "Settings have been reset to default values.")
+
+
 tk.Button(settings_tab, text="Delete Default Configs", command=delete_default_configs).pack(side="left", padx=5, pady=5)
+reset_btn = tk.Button(settings_tab, text="Reset Settings to Default", command=reset_settings_to_default)
+reset_btn.pack(side="left", padx=5, pady=5)
 
 load_game_buttons()
 validate_roms_in_folder()
