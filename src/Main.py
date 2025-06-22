@@ -451,6 +451,25 @@ for game in EXPECTED_MD5:
 refresh_btn = tk.Button(status_frame, text="Refresh ROM Status", command=validate_roms_in_folder)
 refresh_btn.pack(pady=5, anchor="w")
 
+
+def reset_all_defaults():
+    if not os.path.exists(DEFAULT_CONFIG_DIR):
+        messagebox.showinfo("No Defaults", "There are no default configs to delete.")
+        return
+
+    confirm = messagebox.askyesno("Confirm Reset", "Are you sure you want to delete all saved default configs?")
+    if confirm:
+        try:
+            for filename in os.listdir(DEFAULT_CONFIG_DIR):
+                file_path = os.path.join(DEFAULT_CONFIG_DIR, filename)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+            messagebox.showinfo("Defaults Reset", "All default config files have been deleted.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to delete default config files:\n{e}")
+
+tk.Button(settings_tab, text="Reset All Defaults", command=reset_all_defaults).pack(side="left", padx=5, pady=5)
+
 load_game_buttons()
 validate_roms_in_folder()
 root.mainloop()
