@@ -32,6 +32,7 @@ ROM_HEADER_SIGNATURES = {
 }
 
 SETTINGS_FILE = "settings.json"
+DEFAULT_CONFIG_DIR = "default_configs"
 
 valid_rom_paths = {}
 
@@ -176,6 +177,33 @@ def open_file(game_name):
 
 
 def show_patch_options(game_name, file_path, save_path):
+    blood_restore = tk.BooleanVar()
+    vocal_restore = tk.BooleanVar()
+    ex_skill = tk.BooleanVar()
+    bn_viruses = tk.BooleanVar()
+    retry_chips = tk.BooleanVar()
+    no_elf_penalty = tk.BooleanVar()
+    modify_weapon_exp = tk.BooleanVar()
+    modify_cyber_elf_costs = tk.BooleanVar()
+
+    default_config_path = os.path.join(DEFAULT_CONFIG_DIR, f"default_config_{game_name.replace(' ', '')}.json")
+    if os.path.exists(default_config_path):
+        try:
+            with open(default_config_path, 'r') as f:
+                config = json.load(f)
+            options = config.get('options', {})
+            blood_restore.set(options.get('blood_restore', False))
+            vocal_restore.set(options.get('vocal_restore', False))
+            ex_skill.set(options.get('ex_skill', False))
+            bn_viruses.set(options.get('bn_viruses', False))
+            retry_chips.set(options.get('retry_chips', False))
+            no_elf_penalty.set(options.get('no_elf_penalty', False))
+            modify_weapon_exp.set(options.get('modify_weapon_exp', False))
+            modify_cyber_elf_costs.set(options.get('modify_cyber_elf_costs', False))
+        except Exception as e:
+            print(f"Failed to load default config for {game_name}: {e}")
+
+
     def apply_patches():
         patch_list = []
 
@@ -242,6 +270,29 @@ def show_patch_options(game_name, file_path, save_path):
             except Exception as e:
                 messagebox.showerror("Error", f"Could not export patch config:\n{e}")
 
+    def save_as_default_config():
+        os.makedirs(DEFAULT_CONFIG_DIR, exist_ok=True)
+        default_path = os.path.join(DEFAULT_CONFIG_DIR, f"default_config_{game_name.replace(' ', '')}.json")
+        config = {
+            'game': game_name,
+            'options': {
+                'blood_restore': blood_restore.get(),
+                'vocal_restore': vocal_restore.get(),
+                'ex_skill': ex_skill.get(),
+                'bn_viruses': bn_viruses.get(),
+                'retry_chips': retry_chips.get(),
+                'no_elf_penalty': no_elf_penalty.get(),
+                'modify_weapon_exp': modify_weapon_exp.get(),
+                'modify_cyber_elf_costs': modify_cyber_elf_costs.get()
+            }
+        }
+        try:
+            with open(default_path, 'w') as f:
+                json.dump(config, f, indent=2)
+            messagebox.showinfo("Saved", f"Default config saved for {game_name}.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not save default config:\n{e}")
+
     def import_patch_config():
         load_path = filedialog.askopenfilename(filetypes=[("JSON Files", "*.json")])
         if not load_path:
@@ -271,15 +322,6 @@ def show_patch_options(game_name, file_path, save_path):
     patch_window.title(f"Select Patches for {game_name}")
     patch_window.protocol("WM_DELETE_WINDOW", on_window_close)
 
-    blood_restore = tk.BooleanVar()
-    vocal_restore = tk.BooleanVar()
-    ex_skill = tk.BooleanVar()
-    bn_viruses = tk.BooleanVar()
-    retry_chips = tk.BooleanVar()
-    no_elf_penalty = tk.BooleanVar()
-    modify_weapon_exp = tk.BooleanVar()
-    modify_cyber_elf_costs = tk.BooleanVar()
-
     if game_name in ['Zero 1']:
         tk.Checkbutton(patch_window, text="9 Retry Chips at Start of Game", variable=retry_chips).pack(anchor="w")
     if game_name in ['Zero 3']:
@@ -302,6 +344,7 @@ def show_patch_options(game_name, file_path, save_path):
 
     tk.Button(btn_frame, text="Import Config", command=import_patch_config).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Export Config", command=export_patch_config).pack(side="left", padx=5)
+    tk.Button(btn_frame, text="Set as Default Config", command=save_as_default_config).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Apply Patches", command=apply_patches).pack(side="left", padx=5)
     patch_window.wait_window(patch_window)
 
