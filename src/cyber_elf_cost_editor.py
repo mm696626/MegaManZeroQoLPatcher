@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import messagebox, filedialog
 import fractions
@@ -10,6 +11,9 @@ cyber_elf_cost_offsets = {
     'Zero 3': (0x36E2C4, 0x36E30B),
     'Zero 4': (0x886198, 0x8861A5)
 }
+
+DEFAULT_CONFIG_DIR = "default_configs"
+os.makedirs(DEFAULT_CONFIG_DIR, exist_ok=True)
 
 def open_cyber_elf_cost_editor(rom_path, game_name):
     editor = tk.Toplevel()
@@ -130,7 +134,34 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
         except Exception as e:
             messagebox.showerror("Error", f"Could not import config:\n{e}")
 
+    def save_as_default_config():
+        data = {
+            "game": game_name,
+            "values": [var.get() for _, var in entries]
+        }
+        path = os.path.join(DEFAULT_CONFIG_DIR, f"default_cyberelf_{game_name.replace(' ', '')}.json")
+        try:
+            with open(path, 'w') as f:
+                json.dump(data, f, indent=2)
+            messagebox.showinfo("Saved", f"Default config saved for {game_name}.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not save default config:\n{e}")
+
     read_values()
+
+    default_config_path = os.path.join(DEFAULT_CONFIG_DIR, f"default_cyberelf_{game_name.replace(' ', '')}.json")
+    if os.path.exists(default_config_path):
+        try:
+            with open(default_config_path, 'r') as f:
+                data = json.load(f)
+            if data.get("game") == game_name:
+                values = data.get("values", [])
+                if len(values) == len(entries):
+                    for (_, var), val in zip(entries, values):
+                        var.set(str(val))
+        except Exception as e:
+            print(f"Failed to load default cyber-elf config for {game_name}: {e}")
+
     for i, (index, var) in enumerate(entries):
         row = i // 3
         col = (i % 3) * 2
@@ -155,6 +186,7 @@ def open_cyber_elf_cost_editor(rom_path, game_name):
     button_frame.grid(row=last_row + 2, column=0, columnspan=10, pady=10)
     tk.Button(button_frame, text="Import Config", command=import_config).pack(side="left", padx=5)
     tk.Button(button_frame, text="Export Config", command=export_config).pack(side="left", padx=5)
+    tk.Button(button_frame, text="Save As Default Config", command=save_as_default_config).pack(side="left", padx=5)
     tk.Button(button_frame, text="Save and Close", command=write_values).pack(side="left", padx=5)
 
     editor.grab_set()

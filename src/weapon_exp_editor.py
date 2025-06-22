@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import messagebox, filedialog
 import fractions
@@ -21,6 +22,9 @@ weapon_offsets = {
         'Shield Boomerang': (0x3359E8, 4, ["Farther Attack Range", "Farthest Attack Range"]),
     }
 }
+
+DEFAULT_CONFIG_DIR = "default_configs"
+os.makedirs(DEFAULT_CONFIG_DIR, exist_ok=True)
 
 def open_weapon_exp_editor(rom_path, game_name):
     editor = tk.Toplevel()
@@ -163,7 +167,37 @@ def open_weapon_exp_editor(rom_path, game_name):
         except Exception as e:
             messagebox.showerror("Error", f"Could not import config:\n{e}")
 
+    def save_as_default_config():
+        data = {
+            "game": game_name,
+            "values": {
+                weapon: [var.get() for var in vars_list]
+                for weapon, vars_list in entries.items()
+            }
+        }
+        path = os.path.join(DEFAULT_CONFIG_DIR, f"default_weaponexp_{game_name.replace(' ', '')}.json")
+        try:
+            with open(path, 'w') as f:
+                json.dump(data, f, indent=2)
+            messagebox.showinfo("Saved", f"Default config saved for {game_name}.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not save default config:\n{e}")
+
     read_values()
+
+    default_config_path = os.path.join(DEFAULT_CONFIG_DIR, f"default_weaponexp_{game_name.replace(' ', '')}.json")
+    if os.path.exists(default_config_path):
+        try:
+            with open(default_config_path, 'r') as f:
+                data = json.load(f)
+            if data.get("game") == game_name:
+                for weapon, values in data.get("values", {}).items():
+                    if weapon in entries:
+                        for i, val in enumerate(values):
+                            entries[weapon][i].set(val)
+        except Exception as e:
+            print(f"Failed to load default weapon EXP config for {game_name}: {e}")
+
     row = 0
     for weapon, vars_list in entries.items():
         data = weapon_offsets[game_name][weapon]
@@ -204,6 +238,7 @@ def open_weapon_exp_editor(rom_path, game_name):
     btn_frame.grid(row=row, column=0, columnspan=5, pady=10)
     tk.Button(btn_frame, text="Import Config", command=import_config).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Export Config", command=export_config).pack(side="left", padx=5)
+    tk.Button(btn_frame, text="Save As Default Config", command=save_as_default_config).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Save and Close", command=write_values).pack(side="left", padx=5)
 
     editor.grab_set()
