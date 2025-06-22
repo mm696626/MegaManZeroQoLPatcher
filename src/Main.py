@@ -365,7 +365,13 @@ notebook.add(settings_tab, text='Settings')
 
 
 def load_image(image_base):
-    suffix = "_jpn" if box_art_region.get() == "Japan" else ""
+    region = box_art_region.get()
+    if region == "Japan":
+        suffix = "_jpn"
+    elif region == "Europe":
+        suffix = "_eur"
+    else:
+        suffix = ""
     image_path = f"images/{image_base}{suffix}.png"
     try:
         img = Image.open(image_path)
@@ -412,7 +418,7 @@ def update_status_labels():
 
 
 tk.Label(settings_tab, text="Box Art Region:").pack(pady=10)
-region_dropdown = ttk.Combobox(settings_tab, textvariable=box_art_region, values=["USA", "Japan"], state="readonly")
+region_dropdown = ttk.Combobox(settings_tab, textvariable=box_art_region, values=["USA", "Japan", "Europe"], state="readonly")
 region_dropdown.pack()
 
 
