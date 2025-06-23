@@ -125,15 +125,30 @@ def check_rom_validity(file_path, game_name, silent):
 def copy_file(file_path, save_path):
     shutil.copy2(file_path, save_path)
 
+def ask_save_path_with_check(title, filetypes, default_ext):
+    while True:
+        save_path = filedialog.asksaveasfilename(
+            title=title,
+            defaultextension=default_ext,
+            filetypes=filetypes
+        )
+        if not save_path:
+            return None
+        if os.path.abspath(save_path) in map(os.path.abspath, valid_rom_paths.values()):
+            messagebox.showerror("Invalid Save Path", "You cannot overwrite a valid original ROM file.")
+        else:
+            return save_path
+
+
 def open_file(game_name):
     default_folder = default_rom_folder.get()
     valid_path = valid_rom_paths.get(game_name)
 
     if valid_path and os.path.isfile(valid_path):
-        save_path = filedialog.asksaveasfilename(
+        save_path = ask_save_path_with_check(
             title=f"Save Modified {game_name} ROM File",
-            defaultextension=".gba",
-            filetypes=[("GBA Files", "*.gba")]
+            filetypes=[("GBA Files", "*.gba")],
+            default_ext=".gba"
         )
         if not save_path:
             return
@@ -163,10 +178,10 @@ def open_file(game_name):
         except Exception as e:
             messagebox.showerror("Error", f"Failed to copy ROM to default folder:\n{e}")
 
-    save_path = filedialog.asksaveasfilename(
+    save_path = ask_save_path_with_check(
         title=f"Save Modified {game_name} ROM File",
-        defaultextension=".gba",
-        filetypes=filetypes
+        filetypes=[("GBA Files", "*.gba")],
+        default_ext=".gba"
     )
 
     if not save_path:
