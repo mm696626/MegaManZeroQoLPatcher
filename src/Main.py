@@ -436,10 +436,17 @@ tk.Label(settings_tab, text="Box Art Region:").pack(pady=10)
 region_dropdown = ttk.Combobox(settings_tab, textvariable=box_art_region, values=["USA", "Japan", "Europe"], state="readonly")
 region_dropdown.pack()
 
+def update_window_title():
+    if box_art_region.get() == "Japan":
+        root.title("Rockman Zero Series Quality of Life Patcher")
+    else:
+        root.title("Mega Man Zero Series Quality of Life Patcher")
+
 
 def on_region_change(event=None):
     save_settings()
     load_game_buttons()
+    update_window_title()
 
 
 region_dropdown.bind("<<ComboboxSelected>>", on_region_change)
@@ -524,4 +531,5 @@ reset_btn.pack(side="left", padx=5, pady=5)
 
 load_game_buttons()
 validate_roms_in_folder()
+update_window_title()
 root.mainloop()
